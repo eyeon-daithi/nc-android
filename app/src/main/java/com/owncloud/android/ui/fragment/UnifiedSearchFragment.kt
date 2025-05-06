@@ -24,6 +24,7 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import com.ionos.annotation.IonosCustomization
 import com.nextcloud.client.account.CurrentAccountProvider
 import com.nextcloud.client.account.UserAccountManager
 import com.nextcloud.client.core.AsyncRunner
@@ -140,7 +141,7 @@ class UnifiedSearchFragment :
         setupFileDisplayActivity()
         setupAdapter()
         if (supportsOpeningCalendarContactsLocally()) {
-            checkPermissions()
+            // checkPermissions()
         }
     }
 
@@ -183,6 +184,7 @@ class UnifiedSearchFragment :
         }
     }
 
+    @IonosCustomization
     private fun setUpViewModel() {
         vm.searchResults.observe(this, this::onSearchResultChanged)
         vm.isLoading.observe(this) { loading ->
@@ -208,9 +210,7 @@ class UnifiedSearchFragment :
                         requireContext().getString(R.string.file_list_empty_headline_server_search)
                     binding.emptyList.emptyListViewText.text =
                         requireContext().getString(R.string.file_list_empty_unified_search_no_results)
-                    binding.emptyList.emptyListIcon.setImageDrawable(
-                        viewThemeUtils.platform.tintDrawable(requireContext(), R.drawable.ic_search_grey)
-                    )
+                    binding.emptyList.emptyListIcon.setImageResource(R.drawable.ic_search)
                 }
             }
         }

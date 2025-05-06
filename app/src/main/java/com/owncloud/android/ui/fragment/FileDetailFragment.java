@@ -24,6 +24,8 @@ import android.widget.ProgressBar;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.ionos.annotation.IonosCustomization;
+import com.ionos.utils.IonosBuildHelper;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.di.Injectable;
@@ -321,7 +323,15 @@ public class FileDetailFragment extends FileFragment implements OnClickListener,
             .show(fragmentManager, "actions");
     }
 
+    @IonosCustomization("Hide tabs in IONOS")
     private void setupViewPager() {
+        if (IonosBuildHelper.isIonosBuild()) {
+            FileDetailTabAdapter adapter = new FileDetailTabAdapter(requireActivity(), getFile(), user, showSharingTab());
+            binding.pager.setAdapter(adapter);
+            binding.tabLayout.setVisibility(View.GONE);
+            return;
+        }
+
         binding.tabLayout.removeAllTabs();
 
         binding.tabLayout.addTab(binding.tabLayout.newTab().setText(R.string.drawer_item_activities).setIcon(R.drawable.ic_activity));
@@ -352,19 +362,7 @@ public class FileDetailFragment extends FileFragment implements OnClickListener,
                 }
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels);
             }
-
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                if (binding != null) {
-                    final var tab = binding.tabLayout.getTabAt(position);
-                    if (tab != null) {
-                        tab.select();
-                    }
-                }
-            }
         });
-
         binding.tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -389,11 +387,9 @@ public class FileDetailFragment extends FileFragment implements OnClickListener,
         });
 
         binding.tabLayout.post(() -> {
-            if (binding != null) {
-                TabLayout.Tab tab = binding.tabLayout.getTabAt(activeTab);
-                if (tab == null) return;
-                tab.select();
-            }
+            TabLayout.Tab tab1 = binding.tabLayout.getTabAt(activeTab);
+            if (tab1 == null) return;
+            tab1.select();
         });
     }
 
@@ -842,8 +838,9 @@ public class FileDetailFragment extends FileFragment implements OnClickListener,
      *
      * @param isFragmentReplaced
      */
+    @IonosCustomization("Hide tabs in IONOS")
     public void showHideFragmentView(boolean isFragmentReplaced) {
-        binding.tabLayout.setVisibility(isFragmentReplaced ? View.GONE : View.VISIBLE);
+        binding.tabLayout.setVisibility(View.GONE);
         binding.pager.setVisibility(isFragmentReplaced ? View.GONE : View.VISIBLE);
         binding.sharingFrameContainer.setVisibility(isFragmentReplaced ? View.VISIBLE : View.GONE);
         FloatingActionButton mFabMain = requireActivity().findViewById(R.id.fab_main);

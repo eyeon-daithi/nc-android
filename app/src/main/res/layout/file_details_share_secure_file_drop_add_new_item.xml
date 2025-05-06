@@ -19,9 +19,8 @@
         android:layout_gravity="center_vertical"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginEnd="@dimen/standard_margin"
-        android:background="@drawable/round_bgnd"
         android:contentDescription="@string/share"
-        android:padding="@dimen/standard_half_padding"
+        android:scaleType="centerInside"
         android:src="@drawable/shared_via_link" />
 
     <TextView

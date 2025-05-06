@@ -24,6 +24,7 @@ import com.afollestad.sectionedrecyclerview.SectionedRecyclerViewAdapter
 import com.afollestad.sectionedrecyclerview.SectionedViewHolder
 import com.bumptech.glide.request.animation.GlideAnimation
 import com.bumptech.glide.request.target.SimpleTarget
+import com.ionos.annotation.IonosCustomization
 import com.nextcloud.client.account.UserAccountManager
 import com.nextcloud.client.network.ClientFactory
 import com.owncloud.android.R
@@ -319,6 +320,7 @@ class BackupListAdapter(
         return checkedVCards.toIntArray()
     }
 
+    @IonosCustomization("Crash fix")
     fun selectAll(selectAll: Boolean) {
         if (selectAll) {
             contacts.forEachIndexed { index, _ -> checkedVCards.add(index) }
@@ -326,6 +328,7 @@ class BackupListAdapter(
             checkedVCards.clear()
             checkedCalendars.clear()
         }
+        notifyDataSetChanged()
 
         showRestoreButton()
     }

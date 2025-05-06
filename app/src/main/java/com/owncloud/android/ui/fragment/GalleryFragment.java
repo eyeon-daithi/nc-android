@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.ionos.annotation.IonosCustomization;
 import com.nextcloud.utils.extensions.IntentExtensionsKt;
 import com.owncloud.android.BuildConfig;
 import com.owncloud.android.R;
@@ -34,8 +35,7 @@ import com.owncloud.android.ui.activity.FileDisplayActivity;
 import com.owncloud.android.ui.activity.FolderPickerActivity;
 import com.owncloud.android.ui.activity.ToolbarActivity;
 import com.owncloud.android.ui.adapter.CommonOCFileListAdapterInterface;
-import com.owncloud.android.ui.adapter.GalleryAdapter;
-import com.owncloud.android.ui.adapter.OCFileListDelegate;
+import com.owncloud.android.ui.adapter.GallerySimpleAdapter;
 import com.owncloud.android.ui.asynctasks.GallerySearchTask;
 import com.owncloud.android.ui.events.ChangeMenuEvent;
 
@@ -61,14 +61,16 @@ public class GalleryFragment extends OCFileListFragment implements GalleryFragme
     private AsyncTask<Void, Void, GallerySearchTask.Result> photoSearchTask;
     private long endDate;
     private int limit = 150;
-    private GalleryAdapter mAdapter;
+    @IonosCustomization("Custom adapter")
+    private GallerySimpleAdapter mAdapter;
 
     private static final int SELECT_LOCATION_REQUEST_CODE = 212;
     private GalleryFragmentBottomSheetDialog galleryFragmentBottomSheetDialog;
 
     @Inject FileDataStorageManager fileDataStorageManager;
     private final static int maxColumnSizeLandscape = 5;
-    private final static int maxColumnSizePortrait = 2;
+    @IonosCustomization("increased quantity")
+    private final static int maxColumnSizePortrait = 3;
     private int columnSize;
 
     protected void setPhotoSearchQueryRunning(boolean value) {
@@ -167,8 +169,9 @@ public class GalleryFragment extends OCFileListFragment implements GalleryFragme
     }
 
     @Override
+    @IonosCustomization("Custom adapter")
     protected void setAdapter(Bundle args) {
-        mAdapter = new GalleryAdapter(requireContext(),
+        mAdapter = new GallerySimpleAdapter(requireContext(),
                                       accountManager.getUser(),
                                       this,
                                       preferences,

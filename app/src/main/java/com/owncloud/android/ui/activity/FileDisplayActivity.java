@@ -47,6 +47,7 @@ import android.view.WindowManager;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
+import com.ionos.annotation.IonosCustomization;
 import com.nextcloud.appReview.InAppReviewHelper;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.appinfo.AppInfo;
@@ -455,6 +456,7 @@ public class FileDisplayActivity extends FileActivity
     }
 
     @Override
+    @IonosCustomization("Hide account id")
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
@@ -480,7 +482,7 @@ public class FileDisplayActivity extends FileActivity
             onOpenFileIntent(getIntent());
         } else if (RESTART.equals(getIntent().getAction())) {
             // most likely switched to different account
-            DisplayUtils.showSnackMessage(this, String.format(getString(R.string.logged_in_as), accountManager.getUser().getAccountName()));
+            DisplayUtils.showSnackMessage(this, String.format(getString(R.string.logged_in_as), accountManager.getUser().toOwnCloudAccount().getDisplayName()));
         }
 
         upgradeNotificationForInstantUpload();
@@ -1495,6 +1497,7 @@ public class FileDisplayActivity extends FileActivity
     /**
      * Show a text message on screen view for notifying user if content is loading or folder is empty
      */
+    @IonosCustomization
     private void setBackgroundText() {
         final OCFileListFragment ocFileListFragment = getListOfFilesFragment();
         if (ocFileListFragment != null) {
@@ -1502,7 +1505,7 @@ public class FileDisplayActivity extends FileActivity
                 ocFileListFragment.setEmptyListLoadingMessage();
             } else {
                 if (MainApp.isOnlyOnDevice()) {
-                    ocFileListFragment.setMessageForEmptyList(R.string.file_list_empty_headline, R.string.file_list_empty_on_device, R.drawable.ic_list_empty_folder, true);
+                    ocFileListFragment.setMessageForEmptyList(R.string.file_list_empty_headline, R.string.file_list_empty_on_device, R.drawable.ic_list_empty_folder);
                 } else {
                     connectivityService.isNetworkAndServerAvailable(result -> {
                         if (result) {

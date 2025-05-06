@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.ionos.annotation.IonosCustomization;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.utils.mdm.MDMConfig;
@@ -242,7 +243,9 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
          *
          * @param user the account
          */
+        @IonosCustomization("Hide account id")
         private void setUser(User user) {
+            binding.account.setVisibility(View.GONE);
             binding.account.setText(DisplayUtils.convertIdn(user.getAccountName(), false));
             binding.account.setTag(user.getAccountName());
         }

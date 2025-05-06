@@ -41,6 +41,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
+import com.ionos.annotation.IonosCustomization;
+import com.ionos.utils.IonosBuildHelper;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.di.Injectable;
 import com.nextcloud.client.preferences.AppPreferences;
@@ -371,9 +373,14 @@ public class ExtendedListFragment extends Fragment implements
         binding = null;
     }
 
+    @IonosCustomization
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
+            if (IonosBuildHelper.isIonosBuild()) {
+                return true;
+            }
+
             setGridViewColumns(detector.getScaleFactor());
 
             preferences.setGridColumns(mScale);
@@ -601,6 +608,7 @@ public class ExtendedListFragment extends Fragment implements
         });
     }
 
+    @IonosCustomization
     public void setEmptyListMessage(final SearchType searchType) {
         new Handler(Looper.getMainLooper()).post(() -> {
             if (searchType == SearchType.OFFLINE_MODE) {
@@ -611,16 +619,15 @@ public class ExtendedListFragment extends Fragment implements
             } else if (searchType == SearchType.NO_SEARCH) {
                 setMessageForEmptyList(R.string.file_list_empty_headline,
                                        R.string.file_list_empty,
-                                       R.drawable.ic_list_empty_folder,
-                                       true);
+                                       R.drawable.ic_list_empty_folder);
             } else if (searchType == SearchType.FILE_SEARCH) {
                 setMessageForEmptyList(R.string.file_list_empty_headline_server_search,
                                        R.string.file_list_empty,
-                                       R.drawable.ic_search_light_grey);
+                                       R.drawable.ic_search);
             } else if (searchType == SearchType.FAVORITE_SEARCH) {
                 setMessageForEmptyList(R.string.file_list_empty_favorite_headline,
                                        R.string.file_list_empty_favorites_filter_list,
-                                       R.drawable.ic_star_light_yellow);
+                                       R.drawable.favorite);
             } else if (searchType == SearchType.RECENTLY_MODIFIED_SEARCH) {
                 setMessageForEmptyList(R.string.file_list_empty_headline_server_search,
                                        R.string.file_list_empty_recently_modified,
@@ -628,7 +635,7 @@ public class ExtendedListFragment extends Fragment implements
             } else if (searchType == SearchType.REGULAR_FILTER) {
                 setMessageForEmptyList(R.string.file_list_empty_headline_search,
                                        R.string.file_list_empty_search,
-                                       R.drawable.ic_search_light_grey);
+                                       R.drawable.ic_search);
             } else if (searchType == SearchType.SHARED_FILTER) {
                 setMessageForEmptyList(R.string.file_list_empty_shared_headline,
                                        R.string.file_list_empty_shared,
@@ -640,7 +647,7 @@ public class ExtendedListFragment extends Fragment implements
             } else if (searchType == SearchType.LOCAL_SEARCH) {
                 setMessageForEmptyList(R.string.file_list_empty_headline_server_search,
                                        R.string.file_list_empty_local_search,
-                                       R.drawable.ic_search_light_grey);
+                                       R.drawable.ic_search);
             }
         });
     }
@@ -684,8 +691,14 @@ public class ExtendedListFragment extends Fragment implements
     }
 
     @Override
+    @IonosCustomization
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        if (IonosBuildHelper.isIonosBuild()) {
+            mScale = preferences.getGridColumns();
+            setGridViewColumns(1f);
+            return;
+        }
 
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             maxColumnSize = 10;

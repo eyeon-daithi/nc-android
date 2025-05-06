@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ IONOS HiDrive Next - Android Client
+  ~
+  ~ SPDX-FileCopyrightText: 2025 STRATO GmbH.
+  ~ SPDX-License-Identifier: GPL-2.0
+  -->
+<resources>
+    <color name="settings_screen_background">@color/bg_default</color>
+
+    <color name="fab_icon_tint">@color/white</color>
+    <color name="fab_background_color">@color/primary</color>
+    <color name="fab_pressed_background_color">@color/primary_dark</color>
+    <color name="fab_disabled_background_color">@color/disabled_text</color>
+
+    <color name="filelist_file_icon_color">@color/primary</color>
+    <color name="filelist_default_action_icon_color">@color/white</color>
+
+    <color name="file_details_accent_color">@color/curious_blue</color>
+
+    <color name="default_icon_color">@color/primary</color>
+
+    <color name="ionos_default_button_bg_color">@color/dodger_blue</color>
+    <color name="ionos_default_pressed_button_bg_color">@color/royal_blue</color>
+    <color name="ionos_default_disabled_button_bg_color">@color/dark_slate_grey</color>
+
+    <color name="ionos_filled_button_default_text_color">@color/white</color>
+    <color name="ionos_filled_button_pressed_text_color">@color/white</color>
+    <color name="ionos_filled_button_disabled_text_color">@color/dusk</color>
+
+    <color name="ionos_outlined_default_button_bg_color">@color/transparent</color>
+    <color name="ionos_outlined_pressed_button_bg_color">@color/ghost_white</color>
+    <color name="ionos_outlined_disabled_button_bg_color">@color/transparent</color>
+    <color name="ionos_outlined_default_button_stroke_color">@color/ghost_white</color>
+    <color name="ionos_outlined_pressed_button_stroke_color">@color/ghost_white</color>
+    <color name="ionos_outlined_disabled_button_stroke_color">@color/dusk</color>
+    <color name="ionos_outlined_button_default_text_color">@color/ghost_white</color>
+    <color name="ionos_outlined_button_pressed_text_color">@color/madison</color>
+    <color name="ionos_outlined_button_disabled_text_color">@color/dusk</color>
+
+    <color name="ionos_text_button_default_text_color">@color/curious_blue</color>
+    <color name="ionos_text_button_pressed_text_color">@color/cornflower</color>
+    <color name="ionos_text_button_disabled_text_color">@color/dusk</color>
+
+    <color name="ionos_bottom_navigation_background_color">@color/dark_slate_grey</color>
+    <color name="ionos_bottom_navigation_icon_color">@color/metallic_silver</color>
+    <color name="ionos_bottom_navigation_active_indicator_color">@color/dusk</color>
+    <color name="ionos_bottom_navigation_ripple_color">@color/deep_koamaru</color>
+</resources>

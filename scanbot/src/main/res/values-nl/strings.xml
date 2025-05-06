@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ IONOS HiDrive Next - Android Client
+  ~
+  ~ SPDX-FileCopyrightText: 2025 STRATO GmbH.
+  ~ SPDX-License-Identifier: GPL-2.0
+  -->
+
+<resources>
+    <string name="scanbot_camera_automatic_btn">Automatisch</string>
+    <string name="scanbot_camera_detection_result_error_nothing_detected">Geen document</string>
+    <string name="scanbot_camera_detection_result_error_too_dark">Slecht licht</string>
+    <string name="scanbot_camera_detection_result_error_too_noisy">Te onrustige achtergrond</string>
+    <string name="scanbot_camera_detection_result_ok">Niet bewegen</string>
+    <string name="scanbot_camera_detection_result_ok_but_bad_angles">Perspectief</string>
+    <string name="scanbot_camera_detection_result_ok_but_too_small">Blijf dichter bij het document</string>
+    <string name="scanbot_camera_flash_button">Flash</string>
+    <string name="scanbot_camera_import_btn_title">Importeren</string>
+    <string name="scanbot_cancel_btn_title">Afbreken</string>
+    <string name="scanbot_creating_document_error_message">Fout bij het aanmaken van het document</string>
+    <string name="scanbot_detect_document">Document detecteren</string>
+    <string name="scanbot_document_name_format" formatted="false">scan_%1$tY%1$tm%1$td-%1$tH%1$tM%1$tS</string>
+    <string name="scanbot_exit_confirmation_message">Wijzigingen gaan verloren</string>
+    <string name="scanbot_exit_confirmation_title">Document scannen</string>
+    <string name="scanbot_fail">Er is een fout opgetreden. Probeer het later nog eens.</string>
+    <string name="scanbot_file_import_failed">Kan bestand niet importeren %s</string>
+    <string name="scanbot_filter_applying_for_all">Filter toepassen op alle beelden</string>
+    <string name="scanbot_filter_black_n_white">Zwart &amp; Wit</string>
+    <string name="scanbot_filter_color">Kleur</string>
+    <string name="scanbot_filter_grayscale">Grijswaarden</string>
+    <string name="scanbot_filter_magic_color">Magic Color</string>
+    <string name="scanbot_filter_magic_text">Magic Text</string>
+    <string name="scanbot_filter_none">Geen filter</string>
+    <string name="scanbot_filter_popup_apply_for_all">Solliciteer voor alle</string>
+    <string name="scanbot_gallery_bottom_navigation_item_crop">Uitvallen</string>
+    <string name="scanbot_gallery_bottom_navigation_item_delete">Verwijderen</string>
+    <string name="scanbot_gallery_bottom_navigation_item_filter">Filter</string>
+    <string name="scanbot_gallery_bottom_navigation_item_rearrange">Herschikken</string>
+    <string name="scanbot_gallery_bottom_navigation_item_rotate">Draaien</string>
+    <string name="scanbot_gallery_counter_formatted" formatted="false">%d van %d</string>
+    <string name="scanbot_hold_and_drag_to_rearrange_pages">Vasthouden en slepen om pagina\'s te herschikken</string>
+    <string name="scanbot_no_camera_permissions_granted">Camera-toestemming nodig om code te scannen</string>
+    <string name="scanbot_no_enough_free_device_space_message">Er is niet genoeg opslagruimte beschikbaar op het apparaat om foto\'s te kunnen maken. Maak meer ruimte vrij.</string>
+    <string name="scanbot_no_enough_free_device_space_title">Niet genoeg ruimte</string>
+    <string name="scanbot_no_free_space_message">De smartphone heeft niet genoeg opslagruimte.</string>
+    <string name="scanbot_ok_btn_title">OK</string>
+    <string name="scanbot_processing_document_title">Document verwerken ...</string>
+    <string name="scanbot_processing_title">Verwerken...</string>
+    <string name="scanbot_rearrange_title">Pagina\'s herschikken</string>
+    <string name="scanbot_reset_borders">Kader opnieuw instellen</string>
+    <string name="scanbot_save">Opslaan</string>
+    <string name="scanbot_save_as">Behalve als</string>
+    <string name="scanbot_save_file_name_title">Bestandsnaam:</string>
+    <string name="scanbot_save_file_type_title">Bestandstype:</string>
+    <string name="scanbot_save_invalid_file_name">Ongeldige bestandsnaam</string>
+    <string name="scanbot_save_path">Opslaglocatie:</string>
+    <string name="scanbot_unknown_exception">Er is een fout opgetreden. Probeer het later nog eens.</string>
+</resources>

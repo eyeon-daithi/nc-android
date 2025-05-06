@@ -917,6 +917,7 @@
     <string name="stream">Streamen mit…</string>
     <string name="stream_not_possible_headline">Internes Streamen nicht möglich</string>
     <string name="stream_not_possible_message">Laden Sie sich den Inhalt herunter oder nutzen Sie eine externe App.</string>
+    <string name="strict_mode">Strikter Modus: keine HTTP-Verbindung erlaubt!</string>
     <string name="sub_folder_rule_day">Jahr/Monat/Tag</string>
     <string name="sub_folder_rule_month">Jahr/Monat</string>
     <string name="sub_folder_rule_year">Jahr</string>
@@ -1108,6 +1109,9 @@
     <string name="wait_checking_credentials">Überprüfe gespeicherte Anmeldeinformationen</string>
     <string name="wait_for_tmp_copy_from_private_storage">Kopiere Datei von privatem Speicher</string>
     <string name="warn_rename_extension">Das Ändern der Erweiterung kann dazu führen, dass diese Datei in einer anderen Anwendung geöffnet wird</string>
+    <string name="webview_version_check_alert_dialog_message">Bitte aktualisieren Sie die Android System WebView-App für eine Anmeldung</string>
+    <string name="webview_version_check_alert_dialog_positive_button_title">Aktualisieren</string>
+    <string name="webview_version_check_alert_dialog_title">Android System WebView aktualisieren</string>
     <string name="what_s_new_image">Was-gibt\'s-Neues-Bild</string>
     <string name="whats_new_skip">Überspringen</string>
     <string name="whats_new_title">Neu in %1$s</string>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ IONOS HiDrive Next - Android Client
+  ~
+  ~ SPDX-FileCopyrightText: 2025 STRATO GmbH.
+  ~ SPDX-License-Identifier: GPL-2.0
+  -->
+
+<resources>
+    <string name="scanbot_camera_automatic_btn">Automatico</string>
+    <string name="scanbot_camera_detection_result_error_nothing_detected">Nessun documento</string>
+    <string name="scanbot_camera_detection_result_error_too_dark">Luce scarsa</string>
+    <string name="scanbot_camera_detection_result_error_too_noisy">Sfondo troppo rumoroso</string>
+    <string name="scanbot_camera_detection_result_ok">Non muoverti</string>
+    <string name="scanbot_camera_detection_result_ok_but_bad_angles">Prospettiva</string>
+    <string name="scanbot_camera_detection_result_ok_but_too_small">Avvicinarsi</string>
+    <string name="scanbot_camera_flash_button">Flash</string>
+    <string name="scanbot_camera_import_btn_title">Importa</string>
+    <string name="scanbot_cancel_btn_title">Annulla</string>
+    <string name="scanbot_creating_document_error_message">Errore durante la creazione del documento</string>
+    <string name="scanbot_detect_document">Rileva il documento</string>
+    <string name="scanbot_document_name_format" formatted="false">scan_%1$tY%1$tm%1$td-%1$tH%1$tM%1$tS</string>
+    <string name="scanbot_exit_confirmation_message">Il progresso andrà perduto</string>
+    <string name="scanbot_exit_confirmation_title">Scansione del documento</string>
+    <string name="scanbot_fail">Si è verificato un errore. Riprovare più tardi</string>
+    <string name="scanbot_file_import_failed">Non è possibile importare il file %s</string>
+    <string name="scanbot_filter_applying_for_all">Applicazione del filtro a tutte le immagini</string>
+    <string name="scanbot_filter_black_n_white">Bianco e nero</string>
+    <string name="scanbot_filter_color">Colore</string>
+    <string name="scanbot_filter_grayscale">Scala di grigi</string>
+    <string name="scanbot_filter_magic_color">Colore magico</string>
+    <string name="scanbot_filter_magic_text">Testo magico</string>
+    <string name="scanbot_filter_none">Nessun filtro</string>
+    <string name="scanbot_filter_popup_apply_for_all">Applica per tutti</string>
+    <string name="scanbot_gallery_bottom_navigation_item_crop">Ritaglia</string>
+    <string name="scanbot_gallery_bottom_navigation_item_delete">Cancella</string>
+    <string name="scanbot_gallery_bottom_navigation_item_filter">Filtro</string>
+    <string name="scanbot_gallery_bottom_navigation_item_rearrange">Riorganizza</string>
+    <string name="scanbot_gallery_bottom_navigation_item_rotate">Ruota</string>
+    <string name="scanbot_gallery_counter_formatted" formatted="false">%d di %d</string>
+    <string name="scanbot_hold_and_drag_to_rearrange_pages">Tenere premuto e trascinare per riorganizzare le pagine</string>
+    <string name="scanbot_no_camera_permissions_granted">È necessario concedere le autorizzazioni per l\'utilizzo della telecamera per la scansione del codice.</string>
+    <string name="scanbot_no_enough_free_device_space_message">Lo spazio sul dispositivo non è sufficiente per scattare le foto. Per favore, liberate la memoria.</string>
+    <string name="scanbot_no_enough_free_device_space_title">Spazio insufficiente</string>
+    <string name="scanbot_no_free_space_message">Lo smartphone non dispone di spazio di archiviazione sufficiente.</string>
+    <string name="scanbot_ok_btn_title">OK</string>
+    <string name="scanbot_processing_document_title">Elaborazione del documento...</string>
+    <string name="scanbot_processing_title">Elaborazione...</string>
+    <string name="scanbot_rearrange_title">Riorganizzare le pagine</string>
+    <string name="scanbot_reset_borders">Azzeramento dei bordi</string>
+    <string name="scanbot_save">Salva</string>
+    <string name="scanbot_save_as">Salva come</string>
+    <string name="scanbot_save_file_name_title">Nome del file:</string>
+    <string name="scanbot_save_file_type_title">Tipo di file:</string>
+    <string name="scanbot_save_invalid_file_name">Nome file non valido</string>
+    <string name="scanbot_save_path">Salva come</string>
+    <string name="scanbot_unknown_exception">Si è verificato un errore. Riprovare più tardi</string>
+</resources>

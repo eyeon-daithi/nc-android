@@ -17,11 +17,14 @@ import android.content.res.Configuration;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.ionos.annotation.IonosCustomization;
+import com.ionos.utils.IonosBuildHelper;
 import com.nextcloud.appReview.AppReviewShownModel;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.account.UserAccountManagerImpl;
 import com.nextcloud.client.jobs.LogEntry;
+import com.owncloud.android.R;
 import com.owncloud.android.datamodel.ArbitraryDataProvider;
 import com.owncloud.android.datamodel.ArbitraryDataProviderImpl;
 import com.owncloud.android.datamodel.FileDataStorageManager;
@@ -482,7 +485,12 @@ public final class AppPreferencesImpl implements AppPreferences {
      * @return grid columns     grid columns
      */
     @Override
+    @IonosCustomization
     public float getGridColumns() {
+        if (IonosBuildHelper.isIonosBuild()) {
+            return context.getResources().getInteger(R.integer.grid_mode_column_count);
+        }
+
         float columns = preferences.getFloat(AUTO_PREF__GRID_COLUMNS, DEFAULT_GRID_COLUMN);
 
         if (columns < 0) {

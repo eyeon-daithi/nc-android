@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.ionos.annotation.IonosCustomization;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.di.Injectable;
 import com.nextcloud.client.preferences.AppPreferences;
@@ -231,7 +232,9 @@ public class UserInfoActivity extends DrawerActivity implements Injectable {
         }
     }
 
+    @IonosCustomization("Hide account id")
     private void populateUserInfoUi(UserInfo userInfo) {
+        binding.userinfoUsername.setVisibility(View.GONE);
         binding.userinfoUsername.setText(user.getAccountName());
         binding.userinfoIcon.setTag(user.getAccountName());
         DisplayUtils.setAvatar(user,

@@ -6,6 +6,8 @@
  */
 package com.owncloud.android.ui.adapter;
 
+import com.ionos.annotation.IonosCustomization;
+import com.ionos.utils.IonosBuildHelper;
 import com.nextcloud.client.account.User;
 import com.nextcloud.ui.ImageDetailFragment;
 import com.owncloud.android.datamodel.OCFile;
@@ -54,7 +56,13 @@ public class FileDetailTabAdapter extends FragmentStateAdapter {
 
     @NonNull
     @Override
+    @IonosCustomization("Hide tabs in IONOS")
     public Fragment createFragment(int position) {
+        if (IonosBuildHelper.isIonosBuild()) {
+            fileDetailSharingFragment = FileDetailSharingFragment.newInstance(file, user);
+            return fileDetailSharingFragment;
+        }
+
         return switch (position) {
             default -> {
                 fileDetailActivitiesFragment = FileDetailActivitiesFragment.newInstance(file, user);
@@ -72,7 +80,12 @@ public class FileDetailTabAdapter extends FragmentStateAdapter {
     }
 
     @Override
+    @IonosCustomization("Hide tabs in IONOS")
     public int getItemCount() {
+        if (IonosBuildHelper.isIonosBuild()) {
+            return showSharingTab ? 1 : 0;
+        }
+
         if (showSharingTab) {
             if (MimeTypeUtil.isImage(file)) {
                 return 3;

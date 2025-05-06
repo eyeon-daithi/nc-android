@@ -18,6 +18,7 @@ import android.widget.PopupMenu
 import androidx.annotation.VisibleForTesting
 import com.afollestad.sectionedrecyclerview.SectionedRecyclerViewAdapter
 import com.afollestad.sectionedrecyclerview.SectionedViewHolder
+import com.ionos.annotation.IonosCustomization
 import com.nextcloud.android.common.ui.theme.utils.ColorRole
 import com.nextcloud.client.core.Clock
 import com.owncloud.android.R
@@ -437,11 +438,10 @@ class SyncedFolderAdapter(
         binding.root
     )
 
+    @IonosCustomization
     private fun setSyncButtonActiveIcon(syncStatusButton: ImageButton, enabled: Boolean) {
         if (enabled) {
-            syncStatusButton.setImageDrawable(
-                viewThemeUtils.platform.tintDrawable(context, R.drawable.ic_cloud_sync_on, ColorRole.PRIMARY)
-            )
+            syncStatusButton.setImageResource(R.drawable.ic_cloud_sync_on)
         } else {
             syncStatusButton.setImageResource(R.drawable.ic_cloud_sync_off)
         }

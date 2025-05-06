@@ -31,6 +31,8 @@ import android.widget.LinearLayout;
 
 import com.elyeproj.loaderviewlibrary.LoaderImageView;
 import com.google.android.material.chip.Chip;
+import com.ionos.annotation.IonosCustomization;
+import com.ionos.utils.IonosBuildHelper;
 import com.nextcloud.android.common.ui.theme.utils.ColorRole;
 import com.nextcloud.android.lib.resources.recommendations.Recommendation;
 import com.nextcloud.client.account.User;
@@ -350,6 +352,7 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     @Override
+    @IonosCustomization
     public int getItemViewType(int position) {
         if (shouldShowHeader() && position == 0) {
             return VIEW_TYPE_HEADER;
@@ -358,6 +361,10 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (shouldShowHeader() && position == mFiles.size() + 1 ||
             (!shouldShowHeader() && position == mFiles.size())) {
             return VIEW_TYPE_FOOTER;
+        }
+
+        if (IonosBuildHelper.isIonosBuild()) {
+            return VIEW_TYPE_ITEM;
         }
 
         OCFile item = getItem(position);
@@ -535,8 +542,13 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
+    @IonosCustomization
     private void bindListGridItemViewHolder(ListGridItemViewHolder holder, OCFile file) {
         holder.getFileName().setText(mStorageManager.getFilenameConsideringOfflineOperation(file));
+
+        if (IonosBuildHelper.isIonosBuild()) {
+            return;
+        }
 
         boolean gridImage = MimeTypeUtil.isImage(file) || MimeTypeUtil.isVideo(file);
         if (gridView && gridImage) {
@@ -550,33 +562,20 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
+    @IonosCustomization("Change share icon")
     private void bindListItemViewHolder(ListItemViewHolder holder, OCFile file) {
+        holder.getSharedAvatars().setVisibility(View.GONE);
+        holder.getSharedAvatars().removeAllViews();
         if ((file.isSharedWithMe() || file.isSharedWithSharee()) && !isMultiSelect() && !gridView &&
             !hideItemOptions) {
-            holder.getSharedAvatars().setVisibility(View.VISIBLE);
-            holder.getSharedAvatars().removeAllViews();
-
-            String fileOwner = file.getOwnerId();
-            List<ShareeUser> sharees = file.getSharees();
-
-            // use fileOwner if not oneself, then add at first
-            ShareeUser fileOwnerSharee = new ShareeUser(fileOwner, file.getOwnerDisplayName(), ShareType.USER);
-            if (!TextUtils.isEmpty(fileOwner) &&
-                !fileOwner.equals(userId) &&
-                !sharees.contains(fileOwnerSharee)) {
-                sharees.add(fileOwnerSharee);
+            if(file.isSharedViaLink()){
+                holder.getShared().setImageResource(R.drawable.ic_shared_all_types);
+            } else {
+                holder.getShared().setImageResource(R.drawable.shared_via_users);
             }
-
-            Collections.reverse(sharees);
-
-            Log_OC.d(this, "sharees of " + file.getFileName() + ": " + sharees);
-
-            holder.getSharedAvatars().setAvatars(user, sharees, viewThemeUtils);
-            holder.getSharedAvatars().setOnClickListener(
+            holder.getShared().setVisibility(View.VISIBLE);
+            holder.getShared().setOnClickListener(
                 view -> ocFileListFragmentInterface.onShareIconClick(file));
-        } else {
-            holder.getSharedAvatars().setVisibility(View.GONE);
-            holder.getSharedAvatars().removeAllViews();
         }
 
         // tags
@@ -748,6 +747,7 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         return output;
     }
 
+    @IonosCustomization("Hide header in IONOS")
     public boolean shouldShowHeader() {
         if (currentDirectory == null) {
             return false;
@@ -765,7 +765,7 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             return false;
         }
 
-        return !TextUtils.isEmpty(currentDirectory.getRichWorkspace().trim());
+        return !IonosBuildHelper.isIonosBuild() && !TextUtils.isEmpty(currentDirectory.getRichWorkspace().trim());
     }
 
     /**

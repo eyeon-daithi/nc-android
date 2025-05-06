@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ IONOS HiDrive Next - Android Client
+  ~
+  ~ SPDX-FileCopyrightText: 2025 STRATO GmbH.
+  ~ SPDX-License-Identifier: GPL-2.0
+  -->
+
+<resources>
+    <string name="ionos_authorization_method_description">È necessario effettuare il login tramite il browser</string>
+    <string name="ionos_authorization_method_greeting">Benvenuti nel cloud storage</string>
+    <string name="ionos_authorization_method_login_button">Accedi</string>
+    <string name="ionos_authorization_screen_cancel_button">Annulla</string>
+    <string name="ionos_authorization_screen_retry_button">Riprova</string>
+    <string name="ionos_data_protection_agree_button">Consenti</string>
+    <string name="ionos_data_protection_description">Questa applicazione utilizza cookie e tecnologie simili. Facendo clic su Accetto, si acconsente al trattamento dei propri dati e al loro trasferimento a terzi. Visitate la nostra <annotation type="information_link">Privacy Policy </annotation> per ulteriori informazioni, anche sul trattamento dei dati da parte di fornitori terzi. Cliccate su <annotation type="reject_link">Rifiuta</annotation> per impedire l\'uso dello strumento, oppure modificate la vostra scelta in qualsiasi momento nelle Impostazioni.</string>
+    <string name="ionos_data_protection_settings_analytics_description">Questi dati ci aiutano a ottimizzare l\'esperienza dell\'utente e a identificare crash e bug del sistema.</string>
+    <string name="ionos_data_protection_settings_analytics_title">Analisi dei dati per una progettazione basata sulla usabilità</string>
+    <string name="ionos_data_protection_settings_button">Impostazioni</string>
+    <string name="ionos_data_protection_settings_data_gathering_description">La raccolta dei dati è necessaria per utilizzare le funzioni chiave dell\'applicazione.</string>
+    <string name="ionos_data_protection_settings_data_gathering_title">Raccolta dei dati necessari</string>
+    <string name="ionos_data_protection_settings_description">Raccogliamo dati anonimizzati per ottimizzare la nostra applicazione. A tale scopo utilizziamo soluzioni software di vari partner. Il nostro intento è quello di offrire la massima trasparenza e di consentire all\'utente di decidere come vengono raccolti e utilizzati i suoi dati anonimizzati. È possibile modificare le impostazioni in qualsiasi momento anche in seguito, alla voce di menu Privacy. Si prega di notare, tuttavia, che la raccolta dei dati contribuisce in modo significativo all\'ottimizzazione di questa applicazione e che l\'utente impedirebbe questi miglioramenti rifiutando il trasferimento dei dati.</string>
+    <string name="ionos_data_protection_settings_save">Salva le impostazioni</string>
+    <string name="ionos_data_protection_title">Impostazioni sulla privacy</string>
+    <string name="ionos_file_management_permission">Autorizzazioni di archiviazione</string>
+    <string name="ionos_file_management_permission_optional">Autorizzazioni di archiviazione</string>
+    <string name="ionos_file_management_permission_optional_text">%1$s ha bisogno del permesso di accedere ai file per una migliore funzionalità. È possibile consentire o negare l\'accesso.
+</string>
+    <string name="ionos_file_management_permission_text">%1$s ha bisogno del permesso di accedere ai file per una migliore funzionalità. È possibile consentire o negare l\'accesso.</string>
+    <string name="ionos_share_search">Nome o indirizzo e-mail...</string>
+    <string name="ionos_side_menu_storage_used">Storage usato</string>
+    <string name="ionos_toolbar_sort_button_text">Filtro</string>
+</resources>

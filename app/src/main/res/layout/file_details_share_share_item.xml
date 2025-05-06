@@ -28,7 +28,8 @@
         android:layout_marginRight="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/standard_half_margin"
         android:contentDescription="@string/user_icon"
-        android:src="@drawable/ic_user" />
+        android:scaleType="centerInside"
+        android:src="@drawable/account_circle_white" />
 
     <LinearLayout
         android:id="@+id/share_name_layout"
@@ -55,11 +56,11 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:singleLine="true"
-            android:textColor="@color/primary"
+            android:textColor="@color/file_details_accent_color"
             android:textSize="@dimen/two_line_secondary_text_size"
             app:drawableEndCompat="@drawable/ic_baseline_arrow_drop_down_24"
             app:drawableRightCompat="@drawable/ic_baseline_arrow_drop_down_24"
-            app:drawableTint="@color/primary"
+            app:drawableTint="@color/file_details_accent_color"
             tools:text="View only" />
     </LinearLayout>
 

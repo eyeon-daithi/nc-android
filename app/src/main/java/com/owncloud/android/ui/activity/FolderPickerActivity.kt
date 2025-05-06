@@ -22,6 +22,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.ionos.annotation.IonosCustomization
 import com.nextcloud.client.di.Injectable
 import com.nextcloud.utils.fileNameValidator.FileNameValidator
 import com.owncloud.android.R
@@ -206,6 +207,7 @@ open class FolderPickerActivity :
     /**
      * Show a text message on screen view for notifying user if content is loading or folder is empty
      */
+    @IonosCustomization
     private fun setBackgroundText() {
         val listFragment = listOfFilesFragment
 
@@ -219,7 +221,6 @@ open class FolderPickerActivity :
                     R.string.folder_list_empty_headline,
                     R.string.file_list_empty_moving,
                     R.drawable.ic_list_empty_create_folder,
-                    true
                 )
             } else {
                 it.setEmptyListLoadingMessage()

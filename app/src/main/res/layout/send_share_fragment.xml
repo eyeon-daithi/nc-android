@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/share"
                 app:iconPadding="@dimen/standard_half_padding"
-                app:icon="@drawable/shared_via_users" />
+                app:icon="@drawable/ic_share" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_link"
@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 app:iconPadding="@dimen/standard_half_padding"
                 android:text="@string/link"
-                app:icon="@drawable/shared_via_link" />
+                app:icon="@drawable/ic_link" />
 
         </LinearLayout>
 

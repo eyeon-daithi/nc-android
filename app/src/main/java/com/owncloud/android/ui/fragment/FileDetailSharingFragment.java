@@ -31,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.ionos.annotation.IonosCustomization;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.di.Injectable;
@@ -233,6 +234,7 @@ public class FileDetailSharingFragment extends Fragment implements ShareeListAda
         searchConfig.reset();
     }
 
+    @IonosCustomization
     private void setupView() {
         setShareWithYou();
 
@@ -284,7 +286,7 @@ public class FileDetailSharingFragment extends Fragment implements ShareeListAda
                 }
             } else {
                 binding.createLink.setText(R.string.create_link);
-                binding.searchView.setQueryHint(getResources().getString(R.string.share_search_internal));
+                binding.searchView.setQueryHint(getResources().getString(R.string.ionos_share_search));
             }
 
             binding.createLink.setOnClickListener(v -> createPublicShareLink());

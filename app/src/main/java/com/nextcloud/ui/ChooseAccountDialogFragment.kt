@@ -20,6 +20,7 @@ import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.ionos.annotation.IonosCustomization
 import com.nextcloud.client.account.User
 import com.nextcloud.client.account.UserAccountManager
 import com.nextcloud.client.di.Injectable
@@ -84,6 +85,7 @@ class ChooseAccountDialogFragment :
         return builder.create()
     }
 
+    @IonosCustomization("Hide account id")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         accountManager = (activity as BaseActivity).userAccountManager
@@ -104,6 +106,7 @@ class ChooseAccountDialogFragment :
             binding.currentAccount.userName.text = user.toOwnCloudAccount().displayName
             binding.currentAccount.ticker.visibility = View.GONE
             binding.currentAccount.account.text = user.accountName
+            binding.currentAccount.account.visibility = View.GONE
 
             // Defining user right indicator
             val icon = viewThemeUtils.platform.tintPrimaryDrawable(requireContext(), R.drawable.ic_check_circle)

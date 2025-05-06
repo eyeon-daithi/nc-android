@@ -62,6 +62,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/userinfo_icon"
             app:layout_constraintTop_toTopOf="@id/userinfo_icon"
+            app:layout_constraintBottom_toTopOf="@id/userinfo_username"
             tools:text="John Doe" />
 
         <TextView
@@ -70,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/standard_margin"
             android:ellipsize="end"
-            android:lines="2"
+            android:lines="1"
             android:shadowColor="@color/drawer_shadow"
             android:shadowDx="0.5"
             android:shadowDy="0"
@@ -80,6 +81,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/userinfo_fullName"
             app:layout_constraintTop_toBottomOf="@id/userinfo_fullName"
+            app:layout_constraintBottom_toBottomOf="@id/userinfo_icon"
             tools:text="john@nextcloud.com" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

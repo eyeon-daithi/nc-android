@@ -646,7 +646,7 @@
     <string name="permission_storage_access">Des permissions supplémentaires sont exigées pour téléverser et télécharger des fichiers.</string>
     <string name="pick_contact_to_share_with">Choisir un contact avec qui partager</string>
     <string name="picture_set_as_no_app">Aucune application trouvée pour utiliser cette image</string>
-    <string name="pin_home">Épingler sur l\'écran d\'accueil</string>
+    <string name="pin_home">Épingler à l\'écran d\'accueil</string>
     <string name="pin_shortcut_label">Ouvrir %1$s</string>
     <string name="placeholder_fileSize">389 Ko</string>
     <string name="placeholder_filename">placeholder.txt</string>
@@ -795,8 +795,8 @@
     <string name="select_one_template">Veuillez sélectionner un modèle</string>
     <string name="select_template">Sélectionnez un modèle</string>
     <string name="send">Envoyer</string>
-    <string name="send_share">Envoyer Partager</string>
     <string name="sendbutton_description">Icône du bouton d\'envoi</string>
+    <string name="send_share">Envoyer le partage</string>
     <string name="set_as">Utiliser comme</string>
     <string name="set_note">Définir la note</string>
     <string name="set_picture_as">Utiliser l\'image comme</string>
@@ -910,6 +910,7 @@
     <string name="stream">Diffuser avec…</string>
     <string name="stream_not_possible_headline">Diffusion interne impossible</string>
     <string name="stream_not_possible_message">Merci, à la place, de télécharger le média ou d\'utiliser une application externe.</string>
+    <string name="strict_mode">Mode strict : aucune connexion HTTP n\'est autorisée !</string>
     <string name="sub_folder_rule_day">Année/Mois/Jour</string>
     <string name="sub_folder_rule_month">Année/Mois</string>
     <string name="sub_folder_rule_year">Année</string>
@@ -1100,6 +1101,9 @@
     <string name="wait_a_moment">Veuillez patienter…</string>
     <string name="wait_checking_credentials">Vérification des identifiants enregistrés</string>
     <string name="wait_for_tmp_copy_from_private_storage">Copie du fichier depuis le stockage privé</string>
+    <string name="webview_version_check_alert_dialog_message">Veuillez mettre à jour l\'application Android System WebView pour vous connecter</string>
+    <string name="webview_version_check_alert_dialog_positive_button_title">Mise à jour</string>
+    <string name="webview_version_check_alert_dialog_title">Mettre à jour Android System WebView</string>
     <string name="warn_rename_extension">La modification de l\'extension peut entraîner l\'ouverture de ce fichier dans une application différente.</string>
     <string name="what_s_new_image">Image quoi de neuf</string>
     <string name="whats_new_skip">Ignorer</string>

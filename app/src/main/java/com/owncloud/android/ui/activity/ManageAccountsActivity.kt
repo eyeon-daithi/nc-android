@@ -28,6 +28,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.common.collect.Sets
+import com.ionos.annotation.IonosCustomization
+import com.ionos.authorization_method.AuthorizationMethodActivity
 import com.nextcloud.client.account.User
 import com.nextcloud.client.account.UserAccountManager
 import com.nextcloud.client.jobs.download.FileDownloadHelper
@@ -237,10 +239,9 @@ class ManageAccountsActivity :
         return result
     }
 
+    @IonosCustomization
     override fun showFirstRunActivity() {
-        val intent = Intent(applicationContext, FirstRunActivity::class.java).apply {
-            putExtra(FirstRunActivity.EXTRA_ALLOW_CLOSE, true)
-        }
+        val intent = AuthorizationMethodActivity.createInstance(applicationContext);
         startActivity(intent)
     }
 

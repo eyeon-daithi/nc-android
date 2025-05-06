@@ -22,6 +22,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ProgressBar;
 
+import com.ionos.annotation.IonosCustomization;
 import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
 import com.owncloud.android.databinding.ExternalsiteWebviewBinding;
@@ -54,6 +55,7 @@ public class ExternalSiteWebView extends FileActivity {
     String url;
 
     @Override
+    @IonosCustomization
     protected final void onCreate(Bundle savedInstanceState) {
         Log_OC.v(TAG, "onCreate() start");
         bindView();
@@ -78,6 +80,8 @@ public class ExternalSiteWebView extends FileActivity {
         setContentView(getRootView());
 
         postOnCreate();
+
+        viewThemeUtils.platform.themeStatusBar(this);
     }
 
     protected void postOnCreate() {
@@ -147,7 +151,7 @@ public class ExternalSiteWebView extends FileActivity {
             }
         });
 
-        new WebViewUtil().setProxyKKPlus(getWebView());
+        new WebViewUtil(getApplicationContext()).setProxyKKPlus(getWebView());
         getWebView().loadUrl(url);
     }
 

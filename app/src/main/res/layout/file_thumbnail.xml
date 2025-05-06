@@ -28,9 +28,10 @@
 
         <ImageView
             android:id="@+id/videoOverlay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="2dp"
             android:layout_marginStart="2dp"
             android:src="@drawable/video_white"
             android:visibility="gone"

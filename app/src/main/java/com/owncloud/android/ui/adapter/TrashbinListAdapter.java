@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.ionos.annotation.IonosCustomization;
 import com.nextcloud.android.common.ui.theme.utils.ColorRole;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.preferences.AppPreferences;
@@ -117,6 +118,7 @@ public class TrashbinListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
     }
 
+    @IonosCustomization("Checkbox style")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof TrashbinFileViewHolder) {
@@ -153,8 +155,7 @@ public class TrashbinListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             // checkbox
             if (isCheckedFile(file)) {
-                trashbinFileViewHolder.binding.customCheckbox.setImageDrawable(
-                    viewThemeUtils.platform.tintDrawable(context, R.drawable.ic_checkbox_marked, ColorRole.PRIMARY));
+                trashbinFileViewHolder.binding.customCheckbox.setImageResource(R.drawable.ic_checkbox_marked);
             } else {
                 trashbinFileViewHolder.binding.customCheckbox.setImageResource(R.drawable.ic_checkbox_blank_outline);
             }

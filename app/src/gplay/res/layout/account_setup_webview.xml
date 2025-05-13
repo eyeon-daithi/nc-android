@@ -14,12 +14,21 @@
     android:orientation="vertical">
 
     <!-- Login Flow V1 -->
-    <WebView
-        android:visibility="visible"
+    <FrameLayout
+        android:id="@+id/login_webview_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/login_webview">
-    </WebView>
+        android:background="@color/bg_default"
+        android:fitsSystemWindows="true"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <WebView
+            android:id="@+id/login_webview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
 
     <!-- Login Flow V2 -->
     <include

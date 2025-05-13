@@ -171,7 +171,7 @@ android {
             gplay {
                 applicationId "com.ionos.hidrivenext"
                 dimension "default"
-                versionCode 10
+                versionCode 11
                 isDefault = true
                 resConfigs "en", "de", "es", "fr", "nl", "it"
             }

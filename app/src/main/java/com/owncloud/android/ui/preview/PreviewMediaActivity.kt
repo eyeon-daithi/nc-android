@@ -810,19 +810,17 @@ class PreviewMediaActivity :
         Log_OC.v(TAG, "onResume")
     }
 
-    @IonosCustomization("Stopping audio on latter lifecycle stage")
     override fun onDestroy() {
-        releaseVideoPlayer()
         mediaControllerFuture?.let { MediaController.releaseFuture(it) }
         super.onDestroy()
 
         Log_OC.v(TAG, "onDestroy")
     }
 
-    @IonosCustomization("Keeping audio/video playing in background")
     override fun onStop() {
         Log_OC.v(TAG, "onStop")
 
+        releaseVideoPlayer()
         super.onStop()
     }
 

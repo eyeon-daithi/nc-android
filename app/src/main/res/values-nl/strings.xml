@@ -632,7 +632,7 @@
     <string name="permission_storage_access">Aanvullende machtigingen vereist voor het uploaden en downloaden van bestanden.</string>
     <string name="pick_contact_to_share_with">Kies contact om mee te delen</string>
     <string name="picture_set_as_no_app">Geen app gevonden om afbeelding in te stellen</string>
-    <string name="pin_home">Vastmaken aan beginscherm</string>
+    <string name="pin_home">Vastzetten op startscherm</string>
     <string name="pin_shortcut_label">Open %1$s</string>
     <string name="placeholder_fileSize">389 KB</string>
     <string name="placeholder_filename">plaatshouder.txt</string>
@@ -1057,10 +1057,10 @@
     <string name="wait_a_moment">Wacht even…</string>
     <string name="wait_checking_credentials">Opgeslagen inloggegevens nakijken</string>
     <string name="wait_for_tmp_copy_from_private_storage">Bestand vanaf privéopslag kopiëren</string>
-    <string name="webview_version_check_alert_dialog_positive_button_title">Update</string>
-    <string name="warn_rename_extension">Wijzigen van de extensie kan ertoe leiden dat dit bestand in een andere applicatie wordt geopend</string>
     <string name="webview_version_check_alert_dialog_message">Update de  Android System WebView app om in te loggen</string>
+    <string name="webview_version_check_alert_dialog_positive_button_title">Update</string>
     <string name="webview_version_check_alert_dialog_title">Update Android System WebView</string>
+    <string name="warn_rename_extension">Wijzigen van de extensie kan ertoe leiden dat dit bestand in een andere applicatie wordt geopend</string>
     <string name="what_s_new_image">Wat is nieuw afbeelding</string>
     <string name="whats_new_skip">Overslaan</string>
     <string name="whats_new_title">Nieuw in %1$s</string>

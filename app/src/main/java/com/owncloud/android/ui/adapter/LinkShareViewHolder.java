@@ -16,6 +16,7 @@ package com.owncloud.android.ui.adapter;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -60,8 +61,11 @@ class LinkShareViewHolder extends RecyclerView.ViewHolder {
                                                                       null));
             binding.copyLink.setVisibility(View.GONE);
 
-            binding.icon.getBackground().setColorFilter(context.getResources().getColor(R.color.nc_grey),
-                                                        PorterDuff.Mode.SRC_IN);
+            Drawable background = binding.icon.getBackground();
+            if(background != null) {
+                background.setColorFilter(context.getResources().getColor(R.color.nc_grey),
+                                          PorterDuff.Mode.SRC_IN);
+            }
             binding.icon.getDrawable().mutate().setColorFilter(context.getResources().getColor(R.color.icon_on_nc_grey),
                                                                PorterDuff.Mode.SRC_IN);
         } else {

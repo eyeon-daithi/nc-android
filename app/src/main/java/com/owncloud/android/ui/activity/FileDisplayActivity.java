@@ -1657,7 +1657,7 @@ public class FileDisplayActivity extends FileActivity
         if (listOfFiles != null) {  // should never be null, indeed
             OCFile root = getStorageManager().getFileByPath(OCFile.ROOT_PATH);
             listOfFiles.listDirectory(root, MainApp.isOnlyOnDevice(), false);
-            setFile(listOfFiles.getCurrentFile());
+            setFile(root);
             startSyncFolderOperation(root, false);
         }
         binding.fabMain.setImageResource(R.drawable.ic_plus);

@@ -328,7 +328,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
 
     // document scanner not available on FDroid (generic) due to OpenCV binaries
-    gplayImplementation project(':appscan')
     huaweiImplementation project(':appscan')
     qaImplementation project(':appscan')
     implementation project(':scanbot')

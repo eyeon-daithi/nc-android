@@ -6,9 +6,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "",
+        "mobilesdk_app_id": "1:695238986129:android:21f017261e3d0f7bc0f230",
         "android_client_info": {
-          "package_name": "com.nextcloud.client"
+          "package_name": "com.ionos.hidrivenext"
         }
       },
       "oauth_client": [],

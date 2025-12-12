@@ -1,0 +1,3 @@
+[submodule "HdNext/ui-tests"]
+	path = HdNext/ui-tests
+	url = git@github.com:IONOS-Productivity/nc-Android-UiTest-Library.git

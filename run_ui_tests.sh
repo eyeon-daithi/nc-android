@@ -8,6 +8,12 @@
 # UI Test Runner Script
 # Run from the project root directory (HDNextUiTests)
 #
+# To add new tests:
+# 1. Create test class in the appropriate package
+# 2. Tests in 'uitests' package are auto-detected
+# 3. Tests in 'test.tests' package are auto-detected
+# No script changes needed!
+#
 
 set -e
 
@@ -18,17 +24,85 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Configuration - use script directory as project root
+# Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$SCRIPT_DIR"
 PACKAGE_NAME="com.ionos.hidrivenext"
-TEST_PACKAGE="com.ionos.hidrivenext.test.tests"
+
+# Test packages - add new packages here as needed
+declare -A TEST_PACKAGES=(
+    ["uitests"]="com.ionos.hidrivenext.uitests"
+    ["tests"]="com.ionos.hidrivenext.test.tests"
+)
+
+# Default package for running all tests
+DEFAULT_TEST_PACKAGE="com.ionos.hidrivenext.test.tests"
 
 # Parse arguments
 TEST_CLASS=""
 TEST_METHOD=""
 CLEAN_BUILD=false
 SETUP_ONLY=false
+LIST_TESTS=false
+SKIP_BUILD=false
+
+show_help() {
+    echo "Usage: $0 [OPTIONS] [TEST_CLASS[#TEST_METHOD]]"
+    echo ""
+    echo "Options:"
+    echo "  --clean         Clean and rebuild before running tests"
+    echo "  --setup         Only setup test environment (install app, grant permissions)"
+    echo "  --list          List available test classes"
+    echo "  --skip-build    Skip build step (use if already built)"
+    echo "  --help, -h      Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  $0                                              # Run all tests"
+    echo "  $0 LoginLogoutTest                              # Run test class"
+    echo "  $0 LoginLogoutTest#test_complete_login_logout_flow  # Run specific test"
+    echo "  $0 --list                                       # List available tests"
+    echo "  $0 --skip-build LoginLogoutTest                 # Run without rebuilding"
+    echo ""
+    echo "Available test classes:"
+    list_tests
+}
+
+list_tests() {
+    echo ""
+    echo "uitests package (com.ionos.hidrivenext.uitests):"
+    find "$PROJECT_DIR/HdNext/ui-tests/src/main/kotlin/com/ionos/hidrivenext/uitests" \
+        -name "*.kt" -type f 2>/dev/null | while read -r file; do
+        basename "$file" .kt | sed 's/^/  - /'
+    done
+    
+    echo ""
+    echo "test.tests package (com.ionos.hidrivenext.test.tests):"
+    find "$PROJECT_DIR/HdNext/ui-tests/src/main/kotlin/com/ionos/hidrivenext/test/tests" \
+        -name "*.kt" -type f 2>/dev/null | while read -r file; do
+        basename "$file" .kt | sed 's/^/  - /'
+    done
+    echo ""
+}
+
+# Determine which package a test class belongs to
+get_test_package() {
+    local test_class="$1"
+    
+    # Check uitests package
+    if [ -f "$PROJECT_DIR/HdNext/ui-tests/src/main/kotlin/com/ionos/hidrivenext/uitests/${test_class}.kt" ]; then
+        echo "${TEST_PACKAGES[uitests]}"
+        return
+    fi
+    
+    # Check test.tests package
+    if [ -f "$PROJECT_DIR/HdNext/ui-tests/src/main/kotlin/com/ionos/hidrivenext/test/tests/${test_class}.kt" ]; then
+        echo "${TEST_PACKAGES[tests]}"
+        return
+    fi
+    
+    # Default: assume it's in test.tests (for backward compatibility)
+    echo "$DEFAULT_TEST_PACKAGE"
+}
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -40,22 +114,16 @@ while [[ $# -gt 0 ]]; do
             SETUP_ONLY=true
             shift
             ;;
+        --list)
+            LIST_TESTS=true
+            shift
+            ;;
+        --skip-build)
+            SKIP_BUILD=true
+            shift
+            ;;
         --help|-h)
-            echo "Usage: $0 [OPTIONS] [TEST_CLASS[#TEST_METHOD]]"
-            echo ""
-            echo "Options:"
-            echo "  --clean         Clean and rebuild before running tests"
-            echo "  --setup         Only setup test environment (install app, enable network)"
-            echo "  --help, -h      Show this help message"
-            echo ""
-            echo "Examples:"
-            echo "  $0                                      # Run all tests"
-            echo "  $0 OIDCLoginTest                        # Run specific test class"
-            echo "  $0 OIDCLoginTest#user_can_complete_oidc_login  # Run specific test method"
-            echo "  $0 --clean OIDCLoginTest                # Clean build then run tests"
-            echo "  $0 --setup                              # Setup environment only"
-            echo "  $0 LoginLogoutTest                      # Run login/logout test"
-            echo "  $0 LoginLogoutTest#test_complete_login_logout_flow  # Run specific test"
+            show_help
             exit 0
             ;;
         *)
@@ -69,6 +137,12 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Handle --list
+if [ "$LIST_TESTS" = true ]; then
+    list_tests
+    exit 0
+fi
 
 cd "$PROJECT_DIR"
 
@@ -104,7 +178,7 @@ clear_app_data() {
     echo -e "${GREEN}✓ App data cleared${NC}"
 }
 
-# Function to grant required permissions (must be called AFTER app is installed)
+# Function to grant required permissions
 grant_permissions() {
     echo -e "${YELLOW}Granting permissions...${NC}"
     adb shell pm grant $PACKAGE_NAME android.permission.POST_NOTIFICATIONS 2>/dev/null || true
@@ -114,6 +188,11 @@ grant_permissions() {
 
 # Function to build and install app
 build_and_install() {
+    if [ "$SKIP_BUILD" = true ]; then
+        echo -e "${YELLOW}Skipping build (--skip-build)${NC}"
+        return
+    fi
+    
     echo -e "${YELLOW}Building and installing app...${NC}"
     if [ "$CLEAN_BUILD" = true ]; then
         ./gradlew clean installGplayDebug installGplayDebugAndroidTest
@@ -131,38 +210,34 @@ run_tests() {
     echo -e "${BLUE}=========================================${NC}"
     echo ""
 
-    # Determine test class package
-    # uitests package: LoginLogoutSmokeTest, LoginLogoutTest, NavigationTest
-    # test.tests package: OIDCLoginTest, etc.
-    local uitests_classes="LoginLogoutSmokeTest|LoginLogoutTest|NavigationTest"
+    local adb_class=""
     
-    if [ -n "$TEST_CLASS" ] && [ -n "$TEST_METHOD" ]; then
-        if [[ "$TEST_CLASS" =~ ^($uitests_classes)$ ]]; then
-            ADB_CLASS="com.ionos.hidrivenext.uitests.${TEST_CLASS}#${TEST_METHOD}"
+    if [ -n "$TEST_CLASS" ]; then
+        # Auto-detect package for the test class
+        local test_package
+        test_package=$(get_test_package "$TEST_CLASS")
+        
+        if [ -n "$TEST_METHOD" ]; then
+            adb_class="${test_package}.${TEST_CLASS}#${TEST_METHOD}"
+            echo -e "${YELLOW}Running: ${TEST_CLASS}#${TEST_METHOD}${NC}"
+            echo -e "${YELLOW}Package: ${test_package}${NC}"
         else
-            ADB_CLASS="${TEST_PACKAGE}.${TEST_CLASS}#${TEST_METHOD}"
+            adb_class="${test_package}.${TEST_CLASS}"
+            echo -e "${YELLOW}Running: ${TEST_CLASS}${NC}"
+            echo -e "${YELLOW}Package: ${test_package}${NC}"
         fi
-        echo -e "${YELLOW}Running: ${TEST_CLASS}#${TEST_METHOD}${NC}"
-    elif [ -n "$TEST_CLASS" ]; then
-        if [[ "$TEST_CLASS" =~ ^($uitests_classes)$ ]]; then
-            ADB_CLASS="com.ionos.hidrivenext.uitests.${TEST_CLASS}"
-        else
-            ADB_CLASS="${TEST_PACKAGE}.${TEST_CLASS}"
-        fi
-        echo -e "${YELLOW}Running: ${TEST_CLASS}${NC}"
     else
-        ADB_CLASS=""
-        echo -e "${YELLOW}Running all tests in ${TEST_PACKAGE}${NC}"
+        echo -e "${YELLOW}Running all tests in ${DEFAULT_TEST_PACKAGE}${NC}"
     fi
 
     echo ""
 
     # Run the tests using adb instrument
-    if [ -n "$ADB_CLASS" ]; then
-        adb shell am instrument -w -e class "$ADB_CLASS" \
+    if [ -n "$adb_class" ]; then
+        adb shell am instrument -w -e class "$adb_class" \
             com.ionos.hidrivenext.test/com.nextcloud.client.TestRunner
     else
-        adb shell am instrument -w -e package "$TEST_PACKAGE" \
+        adb shell am instrument -w -e package "$DEFAULT_TEST_PACKAGE" \
             com.ionos.hidrivenext.test/com.nextcloud.client.TestRunner
     fi
 
@@ -214,6 +289,7 @@ if [ "$SETUP_ONLY" = true ]; then
     echo -e "${GREEN}=========================================${NC}"
     echo ""
     echo "Run tests with: $0 [TEST_CLASS]"
+    echo "List tests with: $0 --list"
     exit 0
 fi
 

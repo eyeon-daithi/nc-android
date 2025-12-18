@@ -51,8 +51,24 @@ NC_TEST_SERVER_PASSWORD=your-test-password
 1. Open the project in Android Studio
 2. Wait for Gradle sync to complete
 3. Start an emulator
-4. Navigate to: `app/src/androidTest/kotlin/com/ionos/hidrivenext/uitests/LoginLogoutTest.kt`
-5. Right-click on `test_complete_login_logout_flow` → **Run**
+4. **First, grant permissions manually:**
+   ```
+   adb shell pm grant com.ionos.hidrivenext android.permission.POST_NOTIFICATIONS
+   ```
+5. Navigate to: `app/src/androidTest/kotlin/com/ionos/hidrivenext/uitests/LoginLogoutTest.kt`
+6. Right-click on `test_complete_login_logout_flow` → **Run**
+
+> **If you can't see the test files:** The symlinks may not be working. 
+> Follow "Alternative: Manual Symlink Setup" above, then restart Android Studio.
+
+### Available Test Classes
+
+| Class | Package | Description |
+|-------|---------|-------------|
+| LoginLogoutTest | uitests | Full login/logout E2E test |
+| LoginLogoutSmokeTest | uitests | Quick smoke test |
+| NavigationTest | uitests | Navigation tests |
+| OIDCLoginTest | test.tests | OIDC-specific tests |
 
 ### Option B: Using Command Line (Git Bash or PowerShell)
 

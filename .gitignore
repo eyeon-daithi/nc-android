@@ -57,3 +57,7 @@ fastlane/Fastfile
 # python
 **/__pycache__/
 /gradle/verification-keyring.gpg
+
+# Test credentials (do not commit)
+test.properties
+

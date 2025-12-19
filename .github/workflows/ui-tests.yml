@@ -4,29 +4,45 @@
 #
 # GitHub Actions workflow to run UI tests on BrowserStack
 #
-# Required secrets (set in GitHub repo settings):
-#   BROWSERSTACK_USERNAME - Your BrowserStack username
-#   BROWSERSTACK_ACCESS_KEY - Your BrowserStack access key
+# Device Selection Strategy (German Market Focus):
+# Testing Android versions + manufacturer skins, not device models.
+# Key insight: Same manufacturer = same UI behavior regardless of model.
+#
+# Devices:
+# - Google Pixel 9 (Android 15): Stock Android reference device
+# - Samsung Galaxy S24 (Android 14): One UI skin, 35% German market
+# - Xiaomi Redmi Note 13 Pro (Android 13): MIUI skin, 11% German market
+#
+# Required secrets:
+#   SUBMODULE_PAT - PAT with repo access for private submodule
+#   BROWSERSTACK_USERNAME - BrowserStack username
+#   BROWSERSTACK_ACCESS_KEY - BrowserStack access key
 #   TEST_EMAIL - Test account email
 #   TEST_PASSWORD - Test account password
-#   TEST_SERVER - Test server URL (optional, defaults to https://storage.ionos.fr)
+#   TEST_SERVER - Test server URL (optional)
 
 name: UI Tests (BrowserStack)
 
 on:
-  # Manual trigger
   workflow_dispatch:
     inputs:
       test_class:
-        description: 'Test class to run (e.g., LoginLogoutTest)'
+        description: 'Test class to run'
         required: false
         default: 'LoginLogoutTest'
       test_method:
-        description: 'Test method to run (optional)'
+        description: 'Test method (optional, empty = all methods)'
         required: false
         default: 'test_complete_login_logout_flow'
+      device_set:
+        description: 'Device set to test on'
+        required: false
+        default: 'quick'
+        type: choice
+        options:
+          - quick       # 1 device (Pixel 9) - fastest feedback
+          - full        # 3 devices - German market coverage
 
-  # Run on PRs to main branches
   pull_request:
     branches:
       - ionos-release/*
@@ -36,9 +52,22 @@ on:
       - 'HdNext/ui-tests/**'
       - '.github/workflows/ui-tests.yml'
 
-  # Scheduled run (optional - uncomment to enable)
+  # Daily smoke test at 6 AM UTC (7 AM German time)
   # schedule:
-  #   - cron: '0 6 * * *'  # Daily at 6 AM UTC
+  #   - cron: '0 6 * * *'
+
+env:
+  # Device configurations for German market coverage
+  # Strategy: Test Android versions + manufacturer skins, not device models
+  # - Google Pixel: Stock Android reference
+  # - Samsung: 35% German market, One UI skin
+  # - Xiaomi: 11% German market, MIUI skin
+  
+  # QUICK: Just the reference device for fast feedback
+  DEVICES_QUICK: '["Google Pixel 9-15.0"]'
+  
+  # FULL: 3 devices covering Android 13-15 + major manufacturer skins
+  DEVICES_FULL: '["Google Pixel 9-15.0", "Samsung Galaxy S24-14.0", "Xiaomi Redmi Note 13 Pro-13.0"]'
 
 jobs:
   ui-tests:
@@ -50,6 +79,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          token: ${{ secrets.SUBMODULE_PAT }}
           
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -104,6 +134,25 @@ jobs:
           echo "test_url=$TEST_URL" >> $GITHUB_OUTPUT
           echo "Test APK uploaded: $TEST_URL"
           
+      - name: Select device set
+        id: devices
+        run: |
+          DEVICE_SET="${{ github.event.inputs.device_set || 'quick' }}"
+          
+          case "$DEVICE_SET" in
+            full)
+              DEVICES='${{ env.DEVICES_FULL }}'
+              echo "Using FULL device set (3 devices: Pixel + Samsung + Xiaomi)"
+              ;;
+            *)
+              DEVICES='${{ env.DEVICES_QUICK }}'
+              echo "Using QUICK device set (1 device: Pixel 9)"
+              ;;
+          esac
+          
+          echo "devices=$DEVICES" >> $GITHUB_OUTPUT
+          echo "Selected devices: $DEVICES"
+          
       - name: Run tests on BrowserStack
         id: run-tests
         run: |
@@ -125,6 +174,7 @@ jobs:
           fi
           
           echo "Running: $CLASS_FILTER"
+          echo "Devices: ${{ steps.devices.outputs.devices }}"
           
           # Start test execution
           RESPONSE=$(curl -u "${{ secrets.BROWSERSTACK_USERNAME }}:${{ secrets.BROWSERSTACK_ACCESS_KEY }}" \
@@ -133,11 +183,13 @@ jobs:
             -d '{
               "app": "${{ steps.upload.outputs.app_url }}",
               "testSuite": "${{ steps.upload.outputs.test_url }}",
-              "devices": ["Google Pixel 8-14.0"],
+              "devices": ${{ steps.devices.outputs.devices }},
               "class": ["'"$CLASS_FILTER"'"],
               "networkLogs": true,
               "deviceLogs": true,
               "video": true,
+              "locale": "de_DE",
+              "language": "de",
               "project": "HiDrive Next",
               "buildTag": "github-${{ github.run_number }}"
             }')
@@ -173,19 +225,26 @@ jobs:
           echo "Final result:"
           echo "$RESULT" | jq '.'
           
-          # Check if tests passed
-          PASSED=$(echo $RESULT | jq -r '.devices[0].sessions[0].testcases.passed // 0')
-          FAILED=$(echo $RESULT | jq -r '.devices[0].sessions[0].testcases.failed // 0')
-          
+          # Summary
           echo ""
           echo "========================================"
-          echo "Results: $PASSED passed, $FAILED failed"
+          echo "TEST RESULTS SUMMARY"
+          echo "========================================"
+          echo "$RESULT" | jq -r '.devices[] | "Device: \(.device) (\(.os_version)) - \(.sessions[0].status)"'
           echo "========================================"
           echo ""
           echo "View full results: https://app-automate.browserstack.com/dashboard/v2/builds/$BUILD_ID"
           
-          if [ "$FAILED" != "0" ] || [ "$STATUS" = "error" ] || [ "$STATUS" = "timeout" ]; then
-            echo "Tests failed!"
+          # Check if any tests failed
+          FAILED_COUNT=$(echo "$RESULT" | jq '[.devices[].sessions[].testcases.failed // 0] | add')
+          
+          if [ "$FAILED_COUNT" != "0" ] && [ "$FAILED_COUNT" != "null" ]; then
+            echo "Tests failed on one or more devices!"
+            exit 1
+          fi
+          
+          if [ "$STATUS" = "error" ] || [ "$STATUS" = "timeout" ]; then
+            echo "Build ended with status: $STATUS"
             exit 1
           fi
           
@@ -196,6 +255,7 @@ jobs:
           script: |
             const buildId = '${{ steps.run-tests.outputs.build_id }}';
             const dashboardUrl = `https://app-automate.browserstack.com/dashboard/v2/builds/${buildId}`;
+            const deviceSet = '${{ github.event.inputs.device_set || 'quick' }}';
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,
@@ -203,6 +263,7 @@ jobs:
               repo: context.repo.repo,
               body: `## 🧪 UI Test Results\n\n` +
                     `BrowserStack build completed.\n\n` +
+                    `**Device Set:** ${deviceSet}\n` +
                     `📊 [View detailed results](${dashboardUrl})\n\n` +
                     `Build ID: \`${buildId}\``
             });

@@ -276,8 +276,8 @@ jobs:
               "networkLogs": true,
               "deviceLogs": true,
               "video": true,
-              "locale": "de_DE",
-              "language": "de",
+              "locale": "en_US",
+              "language": "en",
               "project": "HiDrive Next",
               "buildTag": "github-${{ github.run_number }}"
             }')

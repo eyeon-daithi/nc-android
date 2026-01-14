@@ -36,7 +36,7 @@ declare -A TEST_PACKAGES=(
 )
 
 # Default package for running all tests
-DEFAULT_TEST_PACKAGE="com.ionos.hidrivenext.test.tests"
+DEFAULT_TEST_PACKAGE="com.ionos.hidrivenext.uitests"
 
 # Parse arguments
 TEST_CLASS=""
@@ -211,6 +211,7 @@ run_tests() {
     echo ""
 
     local adb_class=""
+    local test_output=""
     
     if [ -n "$TEST_CLASS" ]; then
         # Auto-detect package for the test class
@@ -226,24 +227,26 @@ run_tests() {
             echo -e "${YELLOW}Running: ${TEST_CLASS}${NC}"
             echo -e "${YELLOW}Package: ${test_package}${NC}"
         fi
+        
+        echo ""
+        test_output=$(adb shell am instrument -w -e class "$adb_class" \
+            com.ionos.hidrivenext.test/com.nextcloud.client.TestRunner 2>&1)
     else
         echo -e "${YELLOW}Running all tests in ${DEFAULT_TEST_PACKAGE}${NC}"
+        echo ""
+        test_output=$(adb shell am instrument -w -e package "$DEFAULT_TEST_PACKAGE" \
+            com.ionos.hidrivenext.test/com.nextcloud.client.TestRunner 2>&1)
     fi
 
+    # Print the output
+    echo "$test_output"
     echo ""
-
-    # Run the tests using adb instrument
-    if [ -n "$adb_class" ]; then
-        adb shell am instrument -w -e class "$adb_class" \
-            com.ionos.hidrivenext.test/com.nextcloud.client.TestRunner
-    else
-        adb shell am instrument -w -e package "$DEFAULT_TEST_PACKAGE" \
-            com.ionos.hidrivenext.test/com.nextcloud.client.TestRunner
-    fi
-
-    TEST_RESULT=$?
-
-    if [ $TEST_RESULT -ne 0 ]; then
+    
+    # Check for test failures in the output
+    if echo "$test_output" | grep -q "FAILURES\!\!\!" || \
+       echo "$test_output" | grep -E "Failures: [1-9]" > /dev/null 2>&1 || \
+       echo "$test_output" | grep -q "Process crashed" || \
+       echo "$test_output" | grep -q "Empty test suite"; then
         echo ""
         echo -e "${RED}=========================================${NC}"
         echo -e "${RED}Tests Failed!${NC}"
@@ -251,20 +254,20 @@ run_tests() {
         exit 1
     fi
 
+    # Also check if tests actually ran (look for "OK" or test count)
+    if ! echo "$test_output" | grep -qE "(OK \([0-9]+ test|Tests run: [0-9]+)"; then
+        echo ""
+        echo -e "${RED}=========================================${NC}"
+        echo -e "${RED}Tests Failed to Execute!${NC}"
+        echo -e "${RED}=========================================${NC}"
+        exit 1
+    fi
+    
     echo ""
     echo -e "${GREEN}=========================================${NC}"
     echo -e "${GREEN}Tests Passed!${NC}"
     echo -e "${GREEN}=========================================${NC}"
 }
-
-# Main execution flow
-echo "Configuration:"
-echo "  Project: $PROJECT_DIR"
-echo "  Package: $PACKAGE_NAME"
-if [ -n "$TEST_CLASS" ]; then
-    echo "  Test: $TEST_CLASS${TEST_METHOD:+#$TEST_METHOD}"
-fi
-echo ""
 
 # Step 1: Check emulator
 check_emulator

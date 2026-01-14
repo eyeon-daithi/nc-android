@@ -24,335 +24,331 @@
 name: UI Tests (BrowserStack)
 
 on:
-  workflow_dispatch:
-    inputs:
-      test_class:
-        description: 'Test class to run'
-        required: false
-        default: 'LoginLogoutTest'
-      test_method:
-        description: 'Test method (optional, empty = all methods)'
-        required: false
-        default: 'test_complete_login_logout_flow'
-      device_set:
-        description: 'Device set to test on'
-        required: false
-        default: 'quick'
-        type: choice
-        options:
-          - quick       # 1 device (Pixel 9) - fastest feedback
-          - full        # 3 devices - German market coverage
+    workflow_dispatch:
+        inputs:
+            test_class:
+                description: 'Test class to run (TestSetup, TestAuth)'
+                required: false
+                default: 'TestAuth'
+            test_method:
+                description: 'Test method (optional, empty = all methods)'
+                required: false
+                default: ''
+            device_set:
+                description: 'Device set to test on'
+                required: false
+                default: 'quick'
+                type: choice
+                options:
+                    - quick       # 1 device (Pixel 9) - fastest feedback
+                    - full        # 3 devices - German market coverage
 
-  pull_request:
-    branches:
-      - ionos-release/*
-      - ionos-develop
-    paths:
-      - 'app/**'
-      - 'HdNext/ui-tests/**'
-      - '.github/workflows/ui-tests.yml'
+    pull_request:
+        branches:
+            - ionos-release/*
+            - ionos-develop
+        paths:
+            - 'app/**'
+            - 'HdNext/ui-tests/**'
+            - '.github/workflows/ui-tests.yml'
 
-  # Daily smoke test at 6 AM UTC (7 AM German time)
-  # schedule:
-  #   - cron: '0 6 * * *'
+    # Daily smoke test at 6 AM UTC (7 AM German time)
+    # schedule:
+    #   - cron: '0 6 * * *'
 
 env:
-  # Device configurations for German market coverage
-  # Strategy: Test Android versions + manufacturer skins, not device models
-  # - Google Pixel: Stock Android reference
-  # - Samsung: 35% German market, One UI skin
-  # - Xiaomi: 11% German market, MIUI skin
-  
-  # QUICK: Just the reference device for fast feedback
-  DEVICES_QUICK: '["Google Pixel 9-15.0"]'
-  
-  # FULL: 3 devices covering Android 13-15 + major manufacturer skins
-  DEVICES_FULL: '["Google Pixel 9-15.0", "Samsung Galaxy S24-14.0", "Xiaomi Redmi Note 13 Pro-13.0"]'
+    # Device configurations for German market coverage
+    # Strategy: Test Android versions + manufacturer skins, not device models
+    # - Google Pixel: Stock Android reference
+    # - Samsung: 35% German market, One UI skin
+    # - Xiaomi: 11% German market, MIUI skin
+
+    # QUICK: Just the reference device for fast feedback
+    DEVICES_QUICK: '["Google Pixel 9-15.0"]'
+
+    # FULL: 3 devices covering Android 13-15 + major manufacturer skins
+    DEVICES_FULL: '["Google Pixel 9-15.0", "Samsung Galaxy S24-14.0", "Xiaomi Redmi Note 13 Pro-13.0"]'
 
 jobs:
-  ui-tests:
-    name: Run UI Tests on BrowserStack
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.SUBMODULE_PAT }}
-          submodules: false  # Don't auto-fetch, we'll do it manually
-          
-      - name: Checkout submodules with PAT
-        env:
-          SUBMODULE_PAT: ${{ secrets.SUBMODULE_PAT }}
-        run: |
-          # Replace SSH URL with HTTPS+PAT directly in .gitmodules
-          sed -i "s|git@github.com:|https://${SUBMODULE_PAT}@github.com/|g" .gitmodules
-          
-          # Debug: show the modified URL
-          echo "Modified .gitmodules:"
-          cat .gitmodules
-          
-          # Sync the new URL to .git/config
-          git submodule sync --recursive
-          
-          # Now fetch submodules
-          git submodule update --init --recursive
-          
-          echo "Submodules checked out successfully"
-          
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        
-      - name: Configure test credentials
-        run: |
-          mkdir -p ~/.gradle
-          cat > ~/.gradle/gradle.properties << EOF
-          NC_TEST_SERVER_BASEURL=${{ secrets.TEST_SERVER || 'https://storage.ionos.fr' }}
-          NC_TEST_SERVER_USERNAME=${{ secrets.TEST_EMAIL }}
-          NC_TEST_SERVER_PASSWORD=${{ secrets.TEST_PASSWORD }}
-          EOF
-          
-      - name: Get commit hash for cache key
-        id: cache-key
-        run: |
-          # Use short commit hash as APK identifier
-          COMMIT_SHORT=$(git rev-parse --short HEAD)
-          echo "commit_short=$COMMIT_SHORT" >> $GITHUB_OUTPUT
-          echo "Cache key: $COMMIT_SHORT"
-          
-      - name: Check for existing APKs on BrowserStack
-        id: check-apks
-        env:
-          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
-          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-        run: |
-          # Check if APKs with this commit hash already exist
-          APP_ID="hidrive-next-app-${{ steps.cache-key.outputs.commit_short }}"
-          TEST_ID="hidrive-next-tests-${{ steps.cache-key.outputs.commit_short }}"
-          
-          # Get list of recent apps
-          APPS=$(curl -s -u "${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}" \
-            "https://api-cloud.browserstack.com/app-automate/recent_apps")
-          
-          # Check if our app APK exists
-          APP_URL=$(echo "$APPS" | jq -r ".[] | select(.custom_id == \"$APP_ID\") | .app_url" | head -1)
-          
-          # Get list of recent test suites
-          TESTS=$(curl -s -u "${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}" \
-            "https://api-cloud.browserstack.com/app-automate/espresso/v2/test-suites")
-          
-          # Check if our test APK exists
-          TEST_URL=$(echo "$TESTS" | jq -r ".test_suites[] | select(.custom_id == \"$TEST_ID\") | .test_suite_url" | head -1)
-          
-          if [ -n "$APP_URL" ] && [ "$APP_URL" != "null" ] && [ -n "$TEST_URL" ] && [ "$TEST_URL" != "null" ]; then
-            echo "✅ Found existing APKs on BrowserStack!"
-            echo "   App: $APP_URL"
-            echo "   Test: $TEST_URL"
-            echo "skip_build=true" >> $GITHUB_OUTPUT
-            echo "app_url=$APP_URL" >> $GITHUB_OUTPUT
-            echo "test_url=$TEST_URL" >> $GITHUB_OUTPUT
-          else
-            echo "❌ APKs not found, will build..."
-            echo "skip_build=false" >> $GITHUB_OUTPUT
-          fi
-          
-      - name: Build app and test APKs
-        if: steps.check-apks.outputs.skip_build != 'true'
-        run: |
-          # Use lenient dependency verification (warns but doesn't fail)
-          ./gradlew assembleGplayDebug assembleGplayDebugAndroidTest \
-            --dependency-verification=lenient
-          
-      - name: Find APK paths
-        if: steps.check-apks.outputs.skip_build != 'true'
-        id: apk-paths
-        run: |
-          APP_APK=$(find app/build/outputs/apk/gplay/debug -name "*.apk" | head -1)
-          TEST_APK=$(find app/build/outputs/apk/androidTest/gplay/debug -name "*.apk" | head -1)
-          echo "app_apk=$APP_APK" >> $GITHUB_OUTPUT
-          echo "test_apk=$TEST_APK" >> $GITHUB_OUTPUT
-          echo "Found app APK: $APP_APK"
-          echo "Found test APK: $TEST_APK"
-          
-      - name: Upload APKs to BrowserStack
-        if: steps.check-apks.outputs.skip_build != 'true'
-        id: upload
-        env:
-          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
-          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-        run: |
-          COMMIT_SHORT="${{ steps.cache-key.outputs.commit_short }}"
-          
-          # Upload app APK with commit-specific custom_id
-          APP_RESPONSE=$(curl -u "${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}" \
-            -X POST "https://api-cloud.browserstack.com/app-automate/upload" \
-            -F "file=@${{ steps.apk-paths.outputs.app_apk }}" \
-            -F "custom_id=hidrive-next-app-${COMMIT_SHORT}")
-          APP_URL=$(echo $APP_RESPONSE | jq -r '.app_url')
-          echo "app_url=$APP_URL" >> $GITHUB_OUTPUT
-          echo "App uploaded: $APP_URL"
-          
-          # Upload test APK with commit-specific custom_id
-          TEST_RESPONSE=$(curl -u "${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}" \
-            -X POST "https://api-cloud.browserstack.com/app-automate/espresso/v2/test-suite" \
-            -F "file=@${{ steps.apk-paths.outputs.test_apk }}" \
-            -F "custom_id=hidrive-next-tests-${COMMIT_SHORT}")
-          TEST_URL=$(echo $TEST_RESPONSE | jq -r '.test_suite_url')
-          echo "test_url=$TEST_URL" >> $GITHUB_OUTPUT
-          echo "Test APK uploaded: $TEST_URL"
-          
-      - name: Set APK URLs for test run
-        id: apk-urls
-        run: |
-          # Use cached URLs if available, otherwise use newly uploaded ones
-          if [ "${{ steps.check-apks.outputs.skip_build }}" == "true" ]; then
-            echo "app_url=${{ steps.check-apks.outputs.app_url }}" >> $GITHUB_OUTPUT
-            echo "test_url=${{ steps.check-apks.outputs.test_url }}" >> $GITHUB_OUTPUT
-            echo "Using cached APKs"
-          else
-            echo "app_url=${{ steps.upload.outputs.app_url }}" >> $GITHUB_OUTPUT
-            echo "test_url=${{ steps.upload.outputs.test_url }}" >> $GITHUB_OUTPUT
-            echo "Using newly uploaded APKs"
-          fi
-          
-      - name: Select device set
-        id: devices
-        run: |
-          DEVICE_SET="${{ github.event.inputs.device_set || 'quick' }}"
-          
-          case "$DEVICE_SET" in
-            full)
-              DEVICES='${{ env.DEVICES_FULL }}'
-              echo "Using FULL device set (3 devices: Pixel + Samsung + Xiaomi)"
-              ;;
-            *)
-              DEVICES='${{ env.DEVICES_QUICK }}'
-              echo "Using QUICK device set (1 device: Pixel 9)"
-              ;;
-          esac
-          
-          echo "devices=$DEVICES" >> $GITHUB_OUTPUT
-          echo "Selected devices: $DEVICES"
-          
-      - name: Run tests on BrowserStack
-        id: run-tests
-        run: |
-          # Determine test class and method
-          TEST_CLASS="${{ github.event.inputs.test_class || 'LoginLogoutTest' }}"
-          TEST_METHOD="${{ github.event.inputs.test_method || 'test_complete_login_logout_flow' }}"
-          
-          # Determine package based on test class
-          if [[ "$TEST_CLASS" =~ ^(LoginLogoutTest|LoginLogoutSmokeTest|NavigationTest)$ ]]; then
-            FULL_CLASS="com.ionos.hidrivenext.uitests.${TEST_CLASS}"
-          else
-            FULL_CLASS="com.ionos.hidrivenext.test.tests.${TEST_CLASS}"
-          fi
-          
-          if [ -n "$TEST_METHOD" ]; then
-            CLASS_FILTER="${FULL_CLASS}#${TEST_METHOD}"
-          else
-            CLASS_FILTER="${FULL_CLASS}"
-          fi
-          
-          echo "Running: $CLASS_FILTER"
-          echo "Devices: ${{ steps.devices.outputs.devices }}"
-          
-          # Start test execution
-          RESPONSE=$(curl -u "${{ secrets.BROWSERSTACK_USERNAME }}:${{ secrets.BROWSERSTACK_ACCESS_KEY }}" \
-            -X POST "https://api-cloud.browserstack.com/app-automate/espresso/v2/build" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "app": "${{ steps.apk-urls.outputs.app_url }}",
-              "testSuite": "${{ steps.apk-urls.outputs.test_url }}",
-              "devices": ${{ steps.devices.outputs.devices }},
-              "class": ["'"$CLASS_FILTER"'"],
-              "autoGrantPermissions": true,
-              "networkLogs": true,
-              "deviceLogs": true,
-              "video": true,
-              "locale": "en_US",
-              "language": "en",
-              "project": "HiDrive Next",
-              "buildTag": "github-${{ github.run_number }}"
-            }')
-          
-          BUILD_ID=$(echo $RESPONSE | jq -r '.build_id')
-          echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
-          echo "BrowserStack build started: $BUILD_ID"
-          echo "View results: https://app-automate.browserstack.com/dashboard/v2/builds/$BUILD_ID"
-          
-      - name: Wait for test completion
-        run: |
-          BUILD_ID="${{ steps.run-tests.outputs.build_id }}"
-          echo "Waiting for build $BUILD_ID to complete..."
-          
-          while true; do
-            STATUS=$(curl -s -u "${{ secrets.BROWSERSTACK_USERNAME }}:${{ secrets.BROWSERSTACK_ACCESS_KEY }}" \
-              "https://api-cloud.browserstack.com/app-automate/espresso/v2/builds/$BUILD_ID" \
-              | jq -r '.status')
-            
-            echo "Current status: $STATUS"
-            
-            # Exit on any terminal status
-            if [ "$STATUS" = "done" ] || [ "$STATUS" = "passed" ] || [ "$STATUS" = "failed" ] || [ "$STATUS" = "error" ] || [ "$STATUS" = "timeout" ]; then
-              break
-            fi
-            
-            sleep 30
-          done
-          
-          # Get final results
-          RESULT=$(curl -s -u "${{ secrets.BROWSERSTACK_USERNAME }}:${{ secrets.BROWSERSTACK_ACCESS_KEY }}" \
-            "https://api-cloud.browserstack.com/app-automate/espresso/v2/builds/$BUILD_ID")
-          
-          echo "Final result:"
-          echo "$RESULT" | jq '.'
-          
-          # Summary
-          echo ""
-          echo "========================================"
-          echo "TEST RESULTS SUMMARY"
-          echo "========================================"
-          echo "$RESULT" | jq -r '.devices[] | "Device: \(.device) (\(.os_version)) - \(.sessions[0].status)"'
-          echo "========================================"
-          echo ""
-          echo "View full results: https://app-automate.browserstack.com/dashboard/v2/builds/$BUILD_ID"
-          
-          # Check if any tests failed
-          FAILED_COUNT=$(echo "$RESULT" | jq '[.devices[].sessions[].testcases.failed // 0] | add')
-          
-          if [ "$FAILED_COUNT" != "0" ] && [ "$FAILED_COUNT" != "null" ]; then
-            echo "Tests failed on one or more devices!"
-            exit 1
-          fi
-          
-          if [ "$STATUS" = "error" ] || [ "$STATUS" = "timeout" ]; then
-            echo "Build ended with status: $STATUS"
-            exit 1
-          fi
-          
-      - name: Post results to PR
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const buildId = '${{ steps.run-tests.outputs.build_id }}';
-            const dashboardUrl = `https://app-automate.browserstack.com/dashboard/v2/builds/${buildId}`;
-            const deviceSet = '${{ github.event.inputs.device_set || 'quick' }}';
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## 🧪 UI Test Results\n\n` +
-                    `BrowserStack build completed.\n\n` +
-                    `**Device Set:** ${deviceSet}\n` +
-                    `📊 [View detailed results](${dashboardUrl})\n\n` +
-                    `Build ID: \`${buildId}\``
-            });
+    ui-tests:
+        name: Run UI Tests on BrowserStack
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  token: ${{ secrets.SUBMODULE_PAT }}
+                  submodules: false  # Don't auto-fetch, we'll do it manually
+
+            - name: Checkout submodules with PAT
+              env:
+                  SUBMODULE_PAT: ${{ secrets.SUBMODULE_PAT }}
+              run: |
+                  # Replace SSH URL with HTTPS+PAT directly in .gitmodules
+                  sed -i "s|git@github.com:|https://${SUBMODULE_PAT}@github.com/|g" .gitmodules
+
+                  # Debug: show the modified URL
+                  echo "Modified .gitmodules:"
+                  cat .gitmodules
+
+                  # Sync the new URL to .git/config
+                  git submodule sync --recursive
+
+                  # Now fetch submodules
+                  git submodule update --init --recursive
+
+                  echo "Submodules checked out successfully"
+
+            - name: Set up JDK 17
+              uses: actions/setup-java@v4
+              with:
+                  java-version: '17'
+                  distribution: 'temurin'
+
+            - name: Setup Gradle
+              uses: gradle/actions/setup-gradle@v3
+
+            - name: Configure test credentials
+              run: |
+                  mkdir -p ~/.gradle
+                  cat > ~/.gradle/gradle.properties << EOF
+                  NC_TEST_SERVER_BASEURL=${{ secrets.TEST_SERVER || 'https://storage.ionos.fr' }}
+                  NC_TEST_SERVER_USERNAME=${{ secrets.TEST_EMAIL }}
+                  NC_TEST_SERVER_PASSWORD=${{ secrets.TEST_PASSWORD }}
+                  EOF
+
+            - name: Get commit hash for cache key
+              id: cache-key
+              run: |
+                  # Use short commit hash as APK identifier
+                  COMMIT_SHORT=$(git rev-parse --short HEAD)
+                  echo "commit_short=$COMMIT_SHORT" >> $GITHUB_OUTPUT
+                  echo "Cache key: $COMMIT_SHORT"
+
+            - name: Check for existing APKs on BrowserStack
+              id: check-apks
+              env:
+                  BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+                  BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+              run: |
+                  # Check if APKs with this commit hash already exist
+                  APP_ID="hidrive-next-app-${{ steps.cache-key.outputs.commit_short }}"
+                  TEST_ID="hidrive-next-tests-${{ steps.cache-key.outputs.commit_short }}"
+
+                  # Get list of recent apps
+                  APPS=$(curl -s -u "${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}" \
+                    "https://api-cloud.browserstack.com/app-automate/recent_apps")
+
+                  # Check if our app APK exists
+                  APP_URL=$(echo "$APPS" | jq -r ".[] | select(.custom_id == \"$APP_ID\") | .app_url" | head -1)
+
+                  # Get list of recent test suites
+                  TESTS=$(curl -s -u "${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}" \
+                    "https://api-cloud.browserstack.com/app-automate/espresso/v2/test-suites")
+
+                  # Check if our test APK exists
+                  TEST_URL=$(echo "$TESTS" | jq -r ".test_suites[] | select(.custom_id == \"$TEST_ID\") | .test_suite_url" | head -1)
+
+                  if [ -n "$APP_URL" ] && [ "$APP_URL" != "null" ] && [ -n "$TEST_URL" ] && [ "$TEST_URL" != "null" ]; then
+                    echo "✅ Found existing APKs on BrowserStack!"
+                    echo "   App: $APP_URL"
+                    echo "   Test: $TEST_URL"
+                    echo "skip_build=true" >> $GITHUB_OUTPUT
+                    echo "app_url=$APP_URL" >> $GITHUB_OUTPUT
+                    echo "test_url=$TEST_URL" >> $GITHUB_OUTPUT
+                  else
+                    echo "❌ APKs not found, will build..."
+                    echo "skip_build=false" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Build app and test APKs
+              if: steps.check-apks.outputs.skip_build != 'true'
+              run: |
+                  # Use lenient dependency verification (warns but doesn't fail)
+                  ./gradlew assembleGplayDebug assembleGplayDebugAndroidTest \
+                    --dependency-verification=lenient
+
+            - name: Find APK paths
+              if: steps.check-apks.outputs.skip_build != 'true'
+              id: apk-paths
+              run: |
+                  APP_APK=$(find app/build/outputs/apk/gplay/debug -name "*.apk" | head -1)
+                  TEST_APK=$(find app/build/outputs/apk/androidTest/gplay/debug -name "*.apk" | head -1)
+                  echo "app_apk=$APP_APK" >> $GITHUB_OUTPUT
+                  echo "test_apk=$TEST_APK" >> $GITHUB_OUTPUT
+                  echo "Found app APK: $APP_APK"
+                  echo "Found test APK: $TEST_APK"
+
+            - name: Upload APKs to BrowserStack
+              if: steps.check-apks.outputs.skip_build != 'true'
+              id: upload
+              env:
+                  BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+                  BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+              run: |
+                  COMMIT_SHORT="${{ steps.cache-key.outputs.commit_short }}"
+
+                  # Upload app APK with commit-specific custom_id
+                  APP_RESPONSE=$(curl -u "${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}" \
+                    -X POST "https://api-cloud.browserstack.com/app-automate/upload" \
+                    -F "file=@${{ steps.apk-paths.outputs.app_apk }}" \
+                    -F "custom_id=hidrive-next-app-${COMMIT_SHORT}")
+                  APP_URL=$(echo $APP_RESPONSE | jq -r '.app_url')
+                  echo "app_url=$APP_URL" >> $GITHUB_OUTPUT
+                  echo "App uploaded: $APP_URL"
+
+                  # Upload test APK with commit-specific custom_id
+                  TEST_RESPONSE=$(curl -u "${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}" \
+                    -X POST "https://api-cloud.browserstack.com/app-automate/espresso/v2/test-suite" \
+                    -F "file=@${{ steps.apk-paths.outputs.test_apk }}" \
+                    -F "custom_id=hidrive-next-tests-${COMMIT_SHORT}")
+                  TEST_URL=$(echo $TEST_RESPONSE | jq -r '.test_suite_url')
+                  echo "test_url=$TEST_URL" >> $GITHUB_OUTPUT
+                  echo "Test APK uploaded: $TEST_URL"
+
+            - name: Set APK URLs for test run
+              id: apk-urls
+              run: |
+                  # Use cached URLs if available, otherwise use newly uploaded ones
+                  if [ "${{ steps.check-apks.outputs.skip_build }}" == "true" ]; then
+                    echo "app_url=${{ steps.check-apks.outputs.app_url }}" >> $GITHUB_OUTPUT
+                    echo "test_url=${{ steps.check-apks.outputs.test_url }}" >> $GITHUB_OUTPUT
+                    echo "Using cached APKs"
+                  else
+                    echo "app_url=${{ steps.upload.outputs.app_url }}" >> $GITHUB_OUTPUT
+                    echo "test_url=${{ steps.upload.outputs.test_url }}" >> $GITHUB_OUTPUT
+                    echo "Using newly uploaded APKs"
+                  fi
+
+            - name: Select device set
+              id: devices
+              run: |
+                  DEVICE_SET="${{ github.event.inputs.device_set || 'quick' }}"
+
+                  case "$DEVICE_SET" in
+                    full)
+                      DEVICES='${{ env.DEVICES_FULL }}'
+                      echo "Using FULL device set (3 devices: Pixel + Samsung + Xiaomi)"
+                      ;;
+                    *)
+                      DEVICES='${{ env.DEVICES_QUICK }}'
+                      echo "Using QUICK device set (1 device: Pixel 9)"
+                      ;;
+                  esac
+
+                  echo "devices=$DEVICES" >> $GITHUB_OUTPUT
+                  echo "Selected devices: $DEVICES"
+
+            - name: Run tests on BrowserStack
+              id: run-tests
+              run: |
+                  # Determine test class and method
+                  TEST_CLASS="${{ github.event.inputs.test_class || 'TestAuth' }}"
+                  TEST_METHOD="${{ github.event.inputs.test_method || '' }}"
+
+                  # All test classes are in uitests package
+                  FULL_CLASS="com.ionos.hidrivenext.uitests.${TEST_CLASS}"
+
+                  if [ -n "$TEST_METHOD" ]; then
+                    CLASS_FILTER="${FULL_CLASS}#${TEST_METHOD}"
+                  else
+                    CLASS_FILTER="${FULL_CLASS}"
+                  fi
+
+                  echo "Running: $CLASS_FILTER"
+                  echo "Devices: ${{ steps.devices.outputs.devices }}"
+
+                  # Start test execution
+                  RESPONSE=$(curl -u "${{ secrets.BROWSERSTACK_USERNAME }}:${{ secrets.BROWSERSTACK_ACCESS_KEY }}" \
+                    -X POST "https://api-cloud.browserstack.com/app-automate/espresso/v2/build" \
+                    -H "Content-Type: application/json" \
+                    -d '{
+                      "app": "${{ steps.apk-urls.outputs.app_url }}",
+                      "testSuite": "${{ steps.apk-urls.outputs.test_url }}",
+                      "devices": ${{ steps.devices.outputs.devices }},
+                      "class": ["'"$CLASS_FILTER"'"],
+                      "autoGrantPermissions": true,
+                      "networkLogs": true,
+                      "deviceLogs": true,
+                      "video": true,
+                      "locale": "en_US",
+                      "language": "en",
+                      "project": "HiDrive Next",
+                      "buildTag": "github-${{ github.run_number }}"
+                    }')
+
+                  BUILD_ID=$(echo $RESPONSE | jq -r '.build_id')
+                  echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+                  echo "BrowserStack build started: $BUILD_ID"
+                  echo "View results: https://app-automate.browserstack.com/dashboard/v2/builds/$BUILD_ID"
+
+            - name: Wait for test completion
+              run: |
+                  BUILD_ID="${{ steps.run-tests.outputs.build_id }}"
+                  echo "Waiting for build $BUILD_ID to complete..."
+
+                  while true; do
+                    STATUS=$(curl -s -u "${{ secrets.BROWSERSTACK_USERNAME }}:${{ secrets.BROWSERSTACK_ACCESS_KEY }}" \
+                      "https://api-cloud.browserstack.com/app-automate/espresso/v2/builds/$BUILD_ID" \
+                      | jq -r '.status')
+
+                    echo "Current status: $STATUS"
+
+                    # Exit on any terminal status
+                    if [ "$STATUS" = "done" ] || [ "$STATUS" = "passed" ] || [ "$STATUS" = "failed" ] || [ "$STATUS" = "error" ] || [ "$STATUS" = "timeout" ]; then
+                      break
+                    fi
+
+                    sleep 30
+                  done
+
+                  # Get final results
+                  RESULT=$(curl -s -u "${{ secrets.BROWSERSTACK_USERNAME }}:${{ secrets.BROWSERSTACK_ACCESS_KEY }}" \
+                    "https://api-cloud.browserstack.com/app-automate/espresso/v2/builds/$BUILD_ID")
+
+                  echo "Final result:"
+                  echo "$RESULT" | jq '.'
+
+                  # Summary
+                  echo ""
+                  echo "========================================"
+                  echo "TEST RESULTS SUMMARY"
+                  echo "========================================"
+                  echo "$RESULT" | jq -r '.devices[] | "Device: \(.device) (\(.os_version)) - \(.sessions[0].status)"'
+                  echo "========================================"
+                  echo ""
+                  echo "View full results: https://app-automate.browserstack.com/dashboard/v2/builds/$BUILD_ID"
+
+                  # Check if any tests failed
+                  FAILED_COUNT=$(echo "$RESULT" | jq '[.devices[].sessions[].testcases.failed // 0] | add')
+
+                  if [ "$FAILED_COUNT" != "0" ] && [ "$FAILED_COUNT" != "null" ]; then
+                    echo "Tests failed on one or more devices!"
+                    exit 1
+                  fi
+
+                  if [ "$STATUS" = "error" ] || [ "$STATUS" = "timeout" ]; then
+                    echo "Build ended with status: $STATUS"
+                    exit 1
+                  fi
+
+            - name: Post results to PR
+              if: github.event_name == 'pull_request'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const buildId = '${{ steps.run-tests.outputs.build_id }}';
+                      const dashboardUrl = `https://app-automate.browserstack.com/dashboard/v2/builds/${buildId}`;
+                      const deviceSet = '${{ github.event.inputs.device_set || 'quick' }}';
+
+                      github.rest.issues.createComment({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: `## 🧪 UI Test Results\n\n` +
+                              `BrowserStack build completed.\n\n` +
+                              `**Device Set:** ${deviceSet}\n` +
+                              `📊 [View detailed results](${dashboardUrl})\n\n` +
+                              `Build ID: \`${buildId}\``
+                      });

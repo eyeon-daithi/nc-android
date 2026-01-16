@@ -9,7 +9,7 @@ REM Run from the project root directory (HDNextUiTests)
 setlocal enabledelayedexpansion
 
 set PACKAGE_NAME=com.ionos.hidrivenext
-set TEST_PACKAGE=com.ionos.hidrivenext.test.tests
+set TEST_PACKAGE=com.ionos.hidrivenext.uitests
 
 REM Parse arguments
 set TEST_CLASS=
@@ -37,9 +37,9 @@ goto main
 echo Usage: %0 [TEST_CLASS[#TEST_METHOD]]
 echo.
 echo Examples:
-echo   %0                                          Run all tests
-echo   %0 LoginLogoutTest                          Run specific test class
-echo   %0 LoginLogoutTest#test_complete_login_logout_flow   Run specific test
+echo   %0                                    Run all tests
+echo   %0 TestAuth                           Run all auth tests
+echo   %0 TestAuth#testLoginSuccessful       Run specific test
 echo.
 goto end
 
@@ -98,28 +98,12 @@ echo Running Tests
 echo =========================================
 echo.
 
-REM Determine test class package
-set UITESTS_CLASSES=LoginLogoutSmokeTest LoginLogoutTest NavigationTest
-set IS_UITEST=0
-
-for %%c in (%UITESTS_CLASSES%) do (
-    if "%TEST_CLASS%"=="%%c" set IS_UITEST=1
-)
-
 if defined TEST_CLASS (
     if defined TEST_METHOD (
-        if %IS_UITEST%==1 (
-            set ADB_CLASS=com.ionos.hidrivenext.uitests.%TEST_CLASS%#%TEST_METHOD%
-        ) else (
-            set ADB_CLASS=%TEST_PACKAGE%.%TEST_CLASS%#%TEST_METHOD%
-        )
+        set ADB_CLASS=%TEST_PACKAGE%.%TEST_CLASS%#%TEST_METHOD%
         echo Running: %TEST_CLASS%#%TEST_METHOD%
     ) else (
-        if %IS_UITEST%==1 (
-            set ADB_CLASS=com.ionos.hidrivenext.uitests.%TEST_CLASS%
-        ) else (
-            set ADB_CLASS=%TEST_PACKAGE%.%TEST_CLASS%
-        )
+        set ADB_CLASS=%TEST_PACKAGE%.%TEST_CLASS%
         echo Running: %TEST_CLASS%
     )
     echo.
